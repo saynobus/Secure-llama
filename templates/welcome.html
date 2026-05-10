@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gateway | Secure Llama</title>
+    <!-- Modern AI Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@600;800;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* ========================================================= */
+        /* 🎨 MAX UI THEME: SECURE LLAMA IMMERSIVE PORTAL */
+        /* ========================================================= */
+        :root {
+            --bg-base: #000000;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --primary: #3b82f6; 
+            --accent: #8b5cf6;
+            --cyan: #0ea5e9;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body, html {
+            width: 100vw; height: 100vh;
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            overflow: hidden;
+            cursor: none; /* Custom Cursor */
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 🌌 BACKGROUND AND GRID */
+        .ambient-noise {
+            position: fixed; inset: 0; z-index: 10; pointer-events: none; opacity: 0.05;
+            background: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E');
+        }
+
+        .space-grid {
+            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-size: 60px 60px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            z-index: 0;
+            mask-image: radial-gradient(circle at center, black 10%, transparent 80%);
+            -webkit-mask-image: radial-gradient(circle at center, black 10%, transparent 80%);
+            animation: gridDrift 20s linear infinite;
+        }
+
+        @keyframes gridDrift { 100% { background-position: 60px 60px; } }
+
+        /* ✨ MAGNETIC CURSOR */
+        #cursor-dot {
+            position: fixed; top: 0; left: 0; width: 5px; height: 5px;
+            background: #fff; border-radius: 50%;
+            transform: translate(-50%, -50%); pointer-events: none; z-index: 9999;
+            box-shadow: 0 0 15px rgba(255,255,255,1);
+        }
+        #cursor-ring {
+            position: fixed; top: 0; left: 0; width: 45px; height: 45px;
+            border: 1px solid rgba(255,255,255,0.25); border-radius: 50%;
+            transform: translate(-50%, -50%); pointer-events: none; z-index: 9998;
+            transition: transform 0.08s ease-out; backdrop-filter: blur(2px);
+        }
+
+        /* 🚪 THE PORTAL (Black Hole / Aurora Ring) */
+        #portal-wrapper {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(1);
+            width: 400px; height: 400px;
+            display: flex; justify-content: center; align-items: center;
+            z-index: 1; will-change: transform;
+        }
+
+        .portal-ring {
+            position: absolute; border-radius: 50%;
+            border: 2px solid transparent; mix-blend-mode: screen;
+            opacity: 0.8;
+        }
+
+        .ring-outer {
+            width: 100%; height: 100%;
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 80px rgba(59, 130, 246, 0.4), inset 0 0 80px rgba(59, 130, 246, 0.4);
+            animation: spin 12s linear infinite;
+        }
+        
+        .ring-inner {
+            width: 85%; height: 85%;
+            border-color: rgba(139, 92, 246, 0.4);
+            box-shadow: 0 0 60px rgba(139, 92, 246, 0.4), inset 0 0 60px rgba(139, 92, 246, 0.4);
+            animation: spin 8s linear infinite reverse;
+        }
+
+        .ring-core {
+            width: 115%; height: 115%;
+            border-color: rgba(14, 165, 233, 0.3);
+            box-shadow: 0 0 100px rgba(14, 165, 233, 0.5), inset 0 0 100px rgba(14, 165, 233, 0.5);
+            animation: spin 20s ease-in-out infinite alternate;
+        }
+
+        .portal-center-aurora {
+            position: absolute; width: 65%; height: 65%; border-radius: 50%;
+            background: radial-gradient(circle, #ffffff 0%, #3b82f6 30%, transparent 80%);
+            filter: blur(25px); opacity: 0.9;
+            animation: pulseCore 3s infinite alternate ease-in-out;
+            mix-blend-mode: screen;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg) scale(1.05); } }
+        @keyframes pulseCore { 0% { transform: scale(0.85); opacity: 0.7; } 100% { transform: scale(1.15); opacity: 1; } }
+
+        /* 📝 BRANDING & UI LAYER */
+        .company-brand {
+            position: fixed; top: 40px; left: 60px; z-index: 10;
+            display: flex; align-items: center; gap: 12px;
+            font-size: 0.9rem; font-weight: 700; letter-spacing: 3px;
+            text-transform: uppercase; color: #fff;
+            animation: fadeInDown 1s ease-out;
+            will-change: transform, opacity;
+        }
+        .company-logo {
+            width: 38px; height: 38px; background: #fff; color: #000;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 8px; font-weight: 900;
+        }
+
+        #ui-layer {
+            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 5; pointer-events: none; will-change: transform, opacity, filter;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(3rem, 8vw, 7rem); 
+            font-weight: 900; letter-spacing: -2px;
+            margin-bottom: 5px; text-transform: capitalize;
+            /* Match Login Title Gradient */
+            background: linear-gradient(to right, #ffffff 20%, #93c5fd 40%, #c4b5fd 60%, #ffffff 80%);
+            background-size: 200% auto;
+            color: transparent; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: textFlow 6s linear infinite;
+            filter: drop-shadow(0 10px 40px rgba(0,0,0,0.8));
+        }
+
+        @keyframes textFlow { to { background-position: 200% center; } }
+
+        .subtitle {
+            font-size: 1.1rem; font-weight: 400; letter-spacing: 5px;
+            color: var(--text-muted); text-transform: uppercase;
+        }
+
+        /* FAST DIVE HINT */
+        #scroll-hint {
+            position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%);
+            display: flex; flex-direction: column; align-items: center; gap: 12px;
+            will-change: opacity, transform; z-index: 5;
+        }
+        
+        .scroll-text { font-size: 0.75rem; font-weight: 600; letter-spacing: 3px; color: #fff; text-transform: uppercase; opacity: 0.7;}
+        
+        .dive-icon {
+            display: flex; flex-direction: column; align-items: center; gap: 0px;
+            animation: arrowDive 1.5s infinite ease-out;
+        }
+        .dive-line { width: 2px; height: 40px; background: linear-gradient(to bottom, transparent, #fff); }
+        .dive-arrow { width: 12px; height: 12px; border-bottom: 2px solid #fff; border-right: 2px solid #fff; transform: rotate(45deg); margin-top: -6px; }
+        
+        @keyframes arrowDive {
+            0% { transform: translateY(-15px); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(20px); opacity: 0; }
+        }
+
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* 🚪 SPEED DIVE FADE OVERLAY */
+        #fade-overlay {
+            position: fixed; inset: 0; background: #02040a; opacity: 0; pointer-events: none;
+            z-index: 9999; transition: opacity 0.3s ease-in-out;
+        }
+
+        @media (max-width: 768px) {
+            .company-brand { top: 30px; left: 30px; }
+            h1 { font-size: 4rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-noise"></div>
+    <div class="space-grid"></div>
+
+    <!-- Custom Cursor -->
+    <div id="cursor-dot"></div>
+    <div id="cursor-ring"></div>
+
+    <!-- Top Left Brand -->
+    <div class="company-brand" id="company-brand">
+        <div class="company-logo"><i data-lucide="brain" width="20" height="20"></i></div>
+        SAÝNOBUS
+    </div>
+
+    <!-- Portal Animation elements -->
+    <div id="portal-wrapper">
+        <div class="portal-ring ring-outer"></div>
+        <div class="portal-ring ring-inner"></div>
+        <div class="portal-ring ring-core"></div>
+        <div class="portal-center-aurora"></div>
+    </div>
+
+    <!-- UI Overlay (Text) -->
+    <div id="ui-layer">
+        <h1>Secure Llama</h1>
+        <div class="subtitle">Intelligence Gateway</div>
+    </div>
+
+    <!-- Scroll Hint -->
+    <div id="scroll-hint">
+        <div class="dive-icon">
+            <div class="dive-line"></div>
+            <div class="dive-arrow"></div>
+        </div>
+        <div class="scroll-text">Scroll to Dive</div>
+    </div>
+
+    <!-- Flash Fade -->
+    <div id="fade-overlay"></div>
+
+    <script>
+        lucide.createIcons();
+
+        // ==========================================
+        // ✨ MAGNETIC CURSOR
+        // ==========================================
+        const cursorDot = document.getElementById('cursor-dot');
+        const cursorRing = document.getElementById('cursor-ring');
+        let mouseX = window.innerWidth / 2; let mouseY = window.innerHeight / 2;
+        let ringX = mouseX; let ringY = mouseY;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX; mouseY = e.clientY;
+            cursorDot.style.left = `${mouseX}px`; cursorDot.style.top = `${mouseY}px`;
+            
+            // Ultra-smooth parallax on the portal
+            const portalWrapper = document.getElementById('portal-wrapper');
+            const xOffset = (mouseX - window.innerWidth / 2) * 0.02; 
+            const yOffset = (mouseY - window.innerHeight / 2) * 0.02;
+            
+            portalWrapper.style.marginLeft = `${xOffset}px`;
+            portalWrapper.style.marginTop = `${yOffset}px`;
+        });
+
+        function renderCursor() {
+            ringX += (mouseX - ringX) * 0.25; ringY += (mouseY - ringY) * 0.25;
+            cursorRing.style.left = `${ringX}px`; cursorRing.style.top = `${ringY}px`;
+            requestAnimationFrame(renderCursor);
+        }
+        renderCursor();
+
+        // ==========================================
+        // 🚀 FAST DIVE LOGIC
+        // ==========================================
+        const portalWrapper = document.getElementById('portal-wrapper');
+        const uiLayer = document.getElementById('ui-layer');
+        const scrollHint = document.getElementById('scroll-hint');
+        const companyBrand = document.getElementById('company-brand');
+        const fadeOverlay = document.getElementById('fade-overlay');
+        
+        let targetZoom = 1;
+        let currentZoom = 1;
+        let isRedirecting = false;
+
+        function executeDive() {
+            if (isRedirecting) return;
+            isRedirecting = true;
+            
+            // Ultra fast hyper-dive scale
+            portalWrapper.style.transition = 'transform 0.4s cubic-bezier(0.8, 0, 0.1, 1)';
+            portalWrapper.style.transform = 'translate(-50%, -50%) scale(150)';
+            
+            // Fade to the login view background
+            fadeOverlay.style.opacity = '1';
+
+            setTimeout(() => {
+                window.location.href = "/login"; // Preserved Backend Route
+            }, 400); // Super fast redirect
+        }
+
+        function renderFrame() {
+            if (isRedirecting) return; 
+            
+            // Fast lerp math (increased from old script)
+            currentZoom += (targetZoom - currentZoom) * 0.18;
+            
+            // Apply scale
+            portalWrapper.style.transform = `translate(-50%, -50%) scale(${currentZoom})`;
+            
+            // 3D Motion Blur Effect on Text and UI
+            let progress = (currentZoom - 1);
+            if (progress < 0) progress = 0;
+
+            uiLayer.style.transform = `scale(${1 + (progress * 0.6)})`; 
+            uiLayer.style.opacity = Math.max(0, 1 - (progress * 1.5)); 
+            uiLayer.style.filter = `blur(${progress * 8}px)`; 
+            
+            companyBrand.style.opacity = Math.max(0, 1 - (progress * 2)); 
+            companyBrand.style.transform = `translateY(${-progress * 30}px)`;
+
+            scrollHint.style.opacity = Math.max(0, 1 - (progress * 2)); 
+
+            // Trigger point for dive snap
+            if (currentZoom > 1.8) {
+                executeDive();
+            } else {
+                requestAnimationFrame(renderFrame);
+            }
+        }
+        renderFrame();
+
+        // ==========================================
+        // 🎯 SCROLL & TOUCH LISTENERS
+        // ==========================================
+        window.addEventListener('wheel', (e) => {
+            if (isRedirecting) return;
+            let scrollPower = Math.abs(e.deltaY) * 0.01; // Increased power
+            if (scrollPower < 0.2) scrollPower = 0.2; 
+            targetZoom += scrollPower;
+
+            if (targetZoom > 2.2) executeDive();
+        }, { passive: true });
+
+        let touchLastY = 0;
+        window.addEventListener('touchstart', (e) => { touchLastY = e.touches[0].clientY; }, {passive: true});
+        window.addEventListener('touchmove', (e) => {
+            if (isRedirecting) return;
+            let currentY = e.touches[0].clientY;
+            let swipePower = Math.abs(touchLastY - currentY);
+            targetZoom += swipePower * 0.02; // Increased swipe power
+            touchLastY = currentY;
+
+            if (targetZoom > 2.2) executeDive();
+        }, {passive: true});
+
+
+        // ==========================================
+        // 🔥 BFCACHE FAST RESET
+        // ==========================================
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
+                isRedirecting = false;
+                currentZoom = 1; targetZoom = 1;
+                
+                portalWrapper.style.transition = 'none';
+                portalWrapper.style.transform = `translate(-50%, -50%) scale(1)`;
+                fadeOverlay.style.opacity = '0';
+                
+                uiLayer.style.transform = `scale(1)`;
+                uiLayer.style.opacity = '1';
+                uiLayer.style.filter = `blur(0px)`;
+                
+                companyBrand.style.opacity = '1';
+                companyBrand.style.transform = 'translateY(0px)';
+
+                scrollHint.style.opacity = '1';
+                requestAnimationFrame(renderFrame);
+            }
+        });
+
+    </script>
+</body>
+</html>

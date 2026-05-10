@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentinel SOC | Live Simulation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+        :root {
+            --neon-blue: #00f2ff;
+            --neon-green: #00ff9d;
+            --danger-red: #ff003c;
+            --bg-color: #050505;
+            --panel-bg: rgba(20, 20, 20, 0.9);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: white;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            overflow: hidden;
+            background-image: 
+                linear-gradient(rgba(0, 242, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 242, 255, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        /* Top Header */
+        .header {
+            padding: 15px 30px;
+            background: var(--panel-bg);
+            border-bottom: 2px solid var(--neon-blue);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
+        }
+        .header h1 { margin: 0; font-size: 24px; color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-blue); }
+        .target-badge { border: 1px solid var(--neon-green); color: var(--neon-green); padding: 5px 15px; border-radius: 20px; font-weight: bold; }
+
+        /* Simulation Map */
+        .map-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 45vh;
+            padding: 0 50px;
+            position: relative;
+        }
+
+        /* Connector Line connecting nodes */
+        .connector {
+            position: absolute;
+            top: 50%;
+            left: 50px;
+            right: 50px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 1;
+        }
+
+        /* Nodes */
+        .node {
+            width: 120px;
+            height: 120px;
+            background: #111;
+            border: 2px solid #444;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        .node i { font-size: 35px; margin-bottom: 10px; font-style: normal;}
+        .node span { font-size: 14px; font-weight: bold; color: #aaa; }
+        
+        /* Node Animations */
+        .active-safe { border-color: var(--neon-blue); box-shadow: 0 0 30px var(--neon-blue); transform: scale(1.15); }
+        .active-safe span { color: var(--neon-blue); }
+        
+        .active-warn { border-color: #ffaa00; box-shadow: 0 0 30px #ffaa00; transform: scale(1.15); }
+        .active-warn span { color: #ffaa00; }
+
+        .active-danger { border-color: var(--danger-red); box-shadow: 0 0 30px var(--danger-red); transform: scale(1.2); animation: shake 0.3s infinite; }
+        .active-danger span { color: var(--danger-red); }
+
+        @keyframes shake { 0% { transform: translate(1px, 1px) scale(1.2); } 50% { transform: translate(-1px, -1px) scale(1.2); } 100% { transform: translate(1px, 1px) scale(1.2); } }
+
+        /* Terminal Console */
+        .terminal {
+            height: 45vh;
+            background: rgba(0, 0, 0, 0.8);
+            border-top: 2px solid #333;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .log-entry {
+            margin-bottom: 8px;
+            font-size: 14px;
+            line-height: 1.4;
+            animation: slideIn 0.3s ease-out;
+            padding: 5px 10px;
+            border-left: 3px solid transparent;
+        }
+        .log-safe { border-left-color: var(--neon-blue); color: #ccc; }
+        .log-safe strong { color: var(--neon-blue); }
+        
+        .log-warn { border-left-color: #ffaa00; background: rgba(255, 170, 0, 0.05); color: #ffaa00;}
+        
+        .log-danger { border-left-color: var(--danger-red); background: rgba(255, 0, 60, 0.1); color: var(--danger-red); font-weight: bold;}
+
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>🛡️ SENTINEL AI | Threat Visualization Map</h1>
+        <div class="target-badge">TARGET: <span id="target-ui">{{ target_email }}</span></div>
+    </div>
+
+    <div class="map-container">
+        <div class="connector"></div>
+        <div class="node" id="node-ingress"><i>🌐</i><span>INGRESS</span></div>
+        <div class="node" id="node-firewall"><i>🔥</i><span>FIREWALL</span></div>
+        <div class="node" id="node-dlp_scan"><i>👁️</i><span>DLP SCAN</span></div>
+        <div class="node" id="node-vault"><i>🗄️</i><span>VAULT</span></div>
+        <div class="node" id="node-web_core"><i>🌍</i><span>WEB OSINT</span></div>
+        <div class="node" id="node-ai_core"><i>🧠</i><span>AI ENGINE</span></div>
+        <div class="node" id="node-egress"><i>🚀</i><span>EGRESS</span></div>
+    </div>
+
+    <div class="terminal" id="terminal-logs">
+        <div class="log-entry log-safe">
+            [SYSTEM] Sentinel SOC Online. Listening for packets on Port 5000...
+        </div>
+    </div>
+
+    <script>
+        const socket = io();
+        const targetEmail = "{{ target_email }}";
+        const terminal = document.getElementById('terminal-logs');
+
+        // Sounds (Optional: Only works if browser allows autoplay, mostly for effect)
+        const beep = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU'); 
+
+        socket.on('packet_trace', (data) => {
+            // Filter Logic: Agar /inspect/email pe hain, toh sirf us email ka data dikhao
+            if (targetEmail !== "GLOBAL" && data.user !== targetEmail) return;
+
+            // 1. Determine Threat Level Style
+            let statusStyle = 'log-safe';
+            let nodeClass = 'active-safe';
+
+            if (data.is_attack) {
+                statusStyle = 'log-danger';
+                nodeClass = 'active-danger';
+            } else if (data.status === "MASKED" || data.status === "ENCRYPTED" || data.status === "FILTERED") {
+                statusStyle = 'log-warn';
+                nodeClass = 'active-warn';
+            }
+
+            // 2. Add to Terminal
+            const logDiv = document.createElement('div');
+            logDiv.className = `log-entry ${statusStyle}`;
+            logDiv.innerHTML = `[${data.time}] <strong>[${data.node}]</strong> <span style="color:#888;">(${data.user})</span> -> STATUS: ${data.status} | DETAILS: ${data.details}`;
+            terminal.appendChild(logDiv);
+            terminal.scrollTop = terminal.scrollHeight; // Auto-scroll to bottom
+
+            // 3. Node Animation
+            const activeNode = document.getElementById(`node-${data.node.toLowerCase()}`);
+            if (activeNode) {
+                // Reset all nodes first
+                document.querySelectorAll('.node').forEach(n => {
+                    n.className = 'node';
+                });
+                
+                // Activate current node
+                activeNode.classList.add(nodeClass);
+                
+                // Deactivate after 1.5 seconds so it looks like a pulse
+                setTimeout(() => {
+                    activeNode.classList.remove(nodeClass);
+                }, 1500);
+            }
+        });
+    </script>
+</body>
+</html>

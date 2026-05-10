@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Lamma - Anime Edition</title>
+    
+    <!-- Modern Anime Fonts (Nunito & Quicksand) -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <style>
+        /* =========================================================
+           🌸 ANIME MODERN LIGHT THEME (WHITE / PASTEL)
+           ========================================================= */
+        :root {
+            --bg-main: #fdfbfb; /* Clean White */
+            --bg-sidebar: rgba(255, 255, 255, 0.6);
+            --header-bg: rgba(255, 255, 255, 0.7);
+            --border-color: rgba(255, 183, 195, 0.3);
+            --text-primary: #4a4e69;
+            --text-secondary: #9fa0b4;
+            
+            /* Accents */
+            --accent-main: #ff9eaa;
+            --accent-sub: #ffb5a7;
+            --accent-cyan: #a0c4ff;
+            
+            /* Chat Items */
+            --item-hover-bg: rgba(255, 158, 170, 0.1);
+            --item-active-bg: rgba(255, 158, 170, 0.2);
+            
+            /* AI Bubbles */
+            --ai-bubble-bg: rgba(255, 255, 255, 0.85);
+            --ai-bubble-border: rgba(255, 255, 255, 1);
+            --ai-bubble-text: #4a4e69;
+            --ai-bubble-shadow: 0 10px 30px rgba(255, 158, 170, 0.15);
+            
+            /* Code Blocks */
+            --pre-bg: #f8f9fc;
+            --pre-border: rgba(160, 196, 255, 0.4);
+            
+            /* Input Area */
+            --input-area-bg: linear-gradient(to top, rgba(253, 251, 251, 1) 70%, rgba(253, 251, 251, 0));
+            --input-bg: rgba(255, 255, 255, 0.85);
+            --input-focus-bg: #ffffff;
+            --input-text: #4a4e69;
+            
+            /* Simulation Variables */
+            --sim-bg: rgba(255, 255, 255, 0.7);
+            --sim-node-bg: rgba(255, 255, 255, 0.95);
+            --sim-safe: #72efdd;
+            --sim-danger: #ff5d8f;
+            --sim-warn: #ffd166;
+            --sim-text: #4a4e69;
+            --sim-line: rgba(255, 183, 195, 0.6);
+        }
+
+        /* 🌙 ANIME NIGHT MOOD THEME */
+        body.dark-mode {
+            --bg-main: #0b0e14;
+            --bg-sidebar: rgba(15, 20, 35, 0.6);
+            --header-bg: rgba(11, 14, 20, 0.75);
+            --border-color: rgba(167, 139, 250, 0.2);
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            
+            --accent-main: #c4b5fd;
+            --accent-sub: #a78bfa;
+            --accent-cyan: #7dd3fc;
+            
+            --item-hover-bg: rgba(167, 139, 250, 0.15);
+            --item-active-bg: rgba(167, 139, 250, 0.25);
+            
+            --ai-bubble-bg: rgba(20, 25, 40, 0.85);
+            --ai-bubble-border: rgba(167, 139, 250, 0.4);
+            --ai-bubble-text: #e2e8f0;
+            --ai-bubble-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            
+            --pre-bg: #05080f;
+            --pre-border: rgba(125, 211, 252, 0.3);
+            
+            --input-area-bg: linear-gradient(to top, rgba(11, 14, 20, 1) 70%, rgba(11, 14, 20, 0));
+            --input-bg: rgba(20, 25, 40, 0.85);
+            --input-focus-bg: rgba(25, 30, 50, 0.95);
+            --input-text: #e2e8f0;
+            
+            --sim-bg: rgba(11, 14, 20, 0.8);
+            --sim-node-bg: rgba(20, 25, 40, 0.95);
+            --sim-safe: #5eead4;
+            --sim-danger: #fb7185;
+            --sim-warn: #fde047;
+            --sim-text: #e2e8f0;
+            --sim-line: rgba(167, 139, 250, 0.4);
+        }
+
+        /* Night Sky & Firefly Aesthetics */
+        body.dark-mode .anime-bg { background: linear-gradient(135deg, #09090e 0%, #17172b 100%); opacity: 0.9; }
+        body.dark-mode .sakura-petal { background: linear-gradient(135deg, #c4b5fd, #7dd3fc); filter: drop-shadow(0 0 10px rgba(167, 139, 250, 0.8)); opacity: 0.9; }
+        
+        /* Dark Mode Specific Overrides for Borders */
+        body.dark-mode .prof-circle, body.dark-mode .profile-avatar-edit { border-color: rgba(167, 139, 250, 0.5); }
+        body.dark-mode .wrapper, body.dark-mode .send, body.dark-mode #imgPreview { border-color: rgba(167, 139, 250, 0.4); }
+        body.dark-mode #profilePage { background: rgba(11, 14, 20, 0.95); }
+        body.dark-mode .profile-container { background: rgba(20, 25, 40, 0.9); border-color: rgba(167, 139, 250, 0.3); }
+        body.dark-mode .form-group input { background: #05080f; border-color: rgba(125, 211, 252, 0.3); color: #e2e8f0; }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Nunito', sans-serif; }
+
+        body {
+            display: flex; height: 100vh; overflow: hidden;
+            background: var(--bg-main); color: var(--text-primary);
+            position: relative;
+        }
+
+        /* 🌸 Anime Gradient and Cloud FX */
+        .anime-bg {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+            background: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%);
+            opacity: 0.15;
+        }
+
+        /* CSS Sakura Petals */
+        .sakura-petal {
+            position: absolute; top: -10%;
+            width: 14px; height: 14px;
+            background: linear-gradient(135deg, #ffcbf2, #ffb5a7);
+            border-radius: 15px 3px 15px 3px;
+            opacity: 0.7; filter: drop-shadow(0 2px 4px rgba(255,158,170,0.4));
+            animation: fallSakura linear infinite;
+        }
+        @keyframes fallSakura {
+            0% { transform: translate(0, 0) rotate(0deg) scale(0.8); opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.6; }
+            100% { transform: translate(100px, 110vh) rotate(360deg) scale(1.2); opacity: 0; }
+        }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 158, 170, 0.3); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 158, 170, 0.6); }
+
+        /* =========================================================
+           LEFT SIDEBAR (HISTORY)
+           ========================================================= */
+        .sidebar {
+            width: 280px; min-width: 280px;
+            background: var(--bg-sidebar);
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border-right: 1px solid var(--border-color);
+            display: flex; flex-direction: column;
+            transition: margin-left 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 20;
+            box-shadow: 5px 0 20px rgba(255, 158, 170, 0.05);
+        }
+        .sidebar.collapsed { margin-left: -280px; }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            font-family: 'Quicksand', sans-serif; font-weight: 700; font-size: 1.35rem;
+            display: flex; gap: 12px; align-items: center; color: var(--accent-main);
+            border-bottom: 1px solid var(--border-color); letter-spacing: 0.5px;
+        }
+        .sidebar-header i { color: var(--accent-main); filter: drop-shadow(0 2px 5px rgba(255, 158, 170, 0.4)); }
+
+        .new-chat {
+            margin: 20px 15px; padding: 14px;
+            background: linear-gradient(135deg, var(--accent-main), var(--accent-sub));
+            color: white; border: none; border-radius: 16px;
+            cursor: pointer; font-weight: 800; font-size: 1rem; font-family: 'Nunito';
+            display: flex; justify-content: center; align-items: center; gap: 10px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 10px 20px rgba(255, 158, 170, 0.3);
+        }
+        .new-chat:hover {
+            transform: translateY(-3px); box-shadow: 0 15px 25px rgba(255, 158, 170, 0.4); 
+        }
+
+        .chat-list { flex: 1; overflow-y: auto; padding: 0 15px 15px; }
+
+        .sidebar-section-title {
+            font-size: 0.75rem; font-weight: 800; color: var(--accent-sub);
+            text-transform: uppercase; letter-spacing: 2.5px; margin: 20px 5px 10px;
+        }
+
+        .chat-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 14px; border-radius: 12px; cursor: pointer;
+            font-size: 0.9rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px;
+            transition: all 0.2s ease; border: 1px solid transparent;
+        }
+        .chat-item:hover {
+            background: var(--item-hover-bg); color: var(--accent-main); border-color: rgba(255, 158, 170, 0.2);
+        }
+        .chat-item.active {
+            background: var(--item-active-bg); color: var(--accent-main); font-weight: 800;
+            border-color: rgba(255, 158, 170, 0.4);
+        }
+
+        .chat-item-left { display: flex; align-items: center; gap: 12px; overflow: hidden; flex: 1; }
+        .chat-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        
+        .chat-actions { display: flex; gap: 4px; opacity: 0; transition: opacity 0.2s; }
+        .chat-item:hover .chat-actions, .chat-item.active .chat-actions { opacity: 1; }
+
+        .action-btn {
+            background: transparent; border: none; color: var(--text-secondary); cursor: pointer;
+            padding: 6px; border-radius: 8px; font-size: 0.85rem; transition: 0.2s;
+        }
+        .action-btn:hover { background: rgba(255,158,170,0.1); color: var(--accent-main); }
+        .action-btn.pin.active { color: #ffd166; }
+        .action-btn.delete:hover { color: #ff5d8f; background: rgba(255, 93, 143, 0.1); }
+
+        /* =========================================================
+           MAIN CHAT INTERFACE
+           ========================================================= */
+        .main {
+            flex: 1; display: flex; flex-direction: column;
+            position: relative; z-index: 10;
+        }
+
+        .header {
+            padding: 18px 30px; border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--header-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            z-index: 10;
+        }
+
+        .icon-btn {
+            background: transparent; color: var(--text-secondary); border: none;
+            font-size: 1.2rem; cursor: pointer; padding: 10px; border-radius: 12px;
+            transition: all 0.2s;
+        }
+        .icon-btn:hover { background: rgba(255,158,170,0.1); color: var(--accent-main); transform: scale(1.05); }
+
+        .status-pill {
+            display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: #72efdd;
+            background: rgba(114, 239, 221, 0.1); padding: 8px 16px; border-radius: 20px;
+            font-weight: 800; border: 1px solid rgba(114, 239, 221, 0.3); letter-spacing: 1px; text-transform: uppercase;
+        }
+
+        .prof-circle {
+            width: 44px; height: 44px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-main), var(--accent-cyan));
+            color: white; display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-family: 'Quicksand'; cursor: pointer; border: 3px solid #fff;
+            box-shadow: 0 5px 15px rgba(255, 158, 170, 0.4); overflow: hidden; transition: transform 0.3s;
+        }
+        .prof-circle img { width: 100%; height: 100%; object-fit: cover; }
+        .prof-circle:hover { transform: scale(1.1) rotate(5deg); }
+
+        .chat-box {
+            flex: 1; overflow-y: auto; padding: 40px 20px; scroll-behavior: smooth; z-index: 2;
+        }
+
+        .welcome-screen { text-align: center; margin-top: 15vh; animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .welcome-screen h1 {
+            font-family: 'Quicksand', sans-serif; font-size: clamp(3rem, 6vw, 4.5rem); font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-main), var(--accent-cyan));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 20px; filter: drop-shadow(0 5px 10px rgba(255, 158, 170, 0.2));
+        }
+        .welcome-screen p { color: var(--text-secondary); font-size: 1.15rem; font-weight: 600; }
+
+        .msg {
+            display: flex; gap: 15px; margin-bottom: 35px; max-width: 850px; margin-left: auto; margin-right: auto;
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .msg.user { flex-direction: row-reverse; }
+
+        .bubble {
+            padding: 18px 24px; line-height: 1.7; font-size: 1rem; overflow-x: auto;
+        }
+
+        .msg.ai .bubble {
+            background: var(--ai-bubble-bg); backdrop-filter: blur(15px); border-radius: 20px 20px 20px 4px;
+            border: 2px solid var(--ai-bubble-border); color: var(--ai-bubble-text); box-shadow: var(--ai-bubble-shadow);
+            width: 100%; font-weight: 500;
+        }
+
+        .msg.user .bubble {
+            background: linear-gradient(135deg, var(--accent-main), var(--accent-sub)); color: white;
+            border-radius: 20px 20px 4px 20px; box-shadow: 0 10px 20px rgba(255, 158, 170, 0.3);
+            border: 2px solid rgba(255,255,255,0.4); max-width: 85%; font-weight: 600;
+        }
+
+        pre {
+            background: var(--pre-bg); color: var(--text-primary); padding: 18px; border-radius: 12px;
+            margin: 15px 0; overflow-x: auto; border: 1px solid var(--pre-border);
+        }
+        code { font-family: monospace; color: var(--accent-main); font-weight: bold; }
+
+        .msg-action-bar { margin-top: 12px; display: flex; justify-content: flex-end; gap: 8px; }
+        .msg-action-btn {
+            background: transparent; border: none; cursor: pointer; color: var(--text-secondary);
+            font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; gap: 6px;
+            padding: 6px 12px; border-radius: 10px; transition: 0.2s;
+        }
+        .msg.ai .msg-action-btn:hover { background: rgba(255,158,170,0.1); color: var(--accent-main); }
+        .msg.user .msg-action-btn { color: rgba(255,255,255,0.8); }
+        .msg.user .msg-action-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+
+        .speaker-active { color: var(--accent-cyan) !important; animation: pulseVoice 1.5s infinite alternate; }
+        @keyframes pulseVoice { to { transform: scale(1.1); text-shadow: 0 0 10px rgba(160, 196, 255, 0.8); } }
+
+        /* =========================================================
+           INPUT AREA
+           ========================================================= */
+        .input-area {
+            padding: 30px; background: var(--input-area-bg); z-index: 10;
+        }
+
+        .wrapper {
+            max-width: 850px; margin: 0 auto; display: flex; gap: 10px;
+            background: var(--input-bg); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+            padding: 12px 16px; border-radius: 28px; border: 2px solid #fff;
+            align-items: flex-end; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 15px 35px rgba(255, 158, 170, 0.15);
+        }
+        .wrapper:focus-within {
+            background: var(--input-focus-bg); box-shadow: 0 20px 40px rgba(255, 158, 170, 0.25); border-color: rgba(255, 158, 170, 0.5);
+        }
+
+        textarea {
+            flex: 1; padding: 14px 10px; border: none; background: transparent; outline: none;
+            font-size: 1.05rem; color: var(--input-text); resize: none; max-height: 180px; min-height: 50px;
+            overflow-y: auto; line-height: 1.5; transition: color 0.3s; font-weight: 600;
+        }
+        textarea::placeholder { color: var(--text-secondary); font-weight: 500; font-style: italic; }
+
+        .send {
+            background: linear-gradient(135deg, var(--accent-main), var(--accent-cyan)); color: white; border: none;
+            width: 50px; height: 50px; border-radius: 20px; cursor: pointer; transition: 0.3s;
+            display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 15px rgba(160, 196, 255, 0.4);
+            margin-bottom: 2px; border: 2px solid #fff;
+        }
+        .send:hover { transform: scale(1.1) rotate(-5deg); box-shadow: 0 15px 25px rgba(160, 196, 255, 0.6); }
+
+        .recording { color: #ff5d8f !important; animation: pulse 1.5s infinite; }
+        #imgPreview { max-height: 50px; border-radius: 12px; display: none; margin: 0 8px 8px 0; border: 2px solid #fff; box-shadow: 0 5px 10px rgba(0,0,0,0.1); }
+
+        .ldr {
+            display: none; text-align: center; padding: 20px; color: var(--accent-main); font-weight: 800; font-size: 1rem; letter-spacing: 1px;
+        }
+
+        /* =========================================================
+           🚨 RIGHT SIDEBAR: LIVE SIMULATION
+           ========================================================= */
+        .sim-sidebar {
+            width: 320px; min-width: 320px; background: var(--sim-bg);
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border-left: 1px solid var(--border-color); display: flex; flex-direction: column;
+            transition: margin-right 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 20;
+            margin-right: -320px; box-shadow: -5px 0 20px rgba(255, 158, 170, 0.05);
+        }
+        .sim-sidebar.open { margin-right: 0; }
+
+        .sim-header {
+            padding: 24px 20px; border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .sim-header h3 {
+            font-family: 'Quicksand'; font-size: 1.15rem; color: var(--accent-main); margin: 0; display: flex; gap: 10px; align-items: center; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 800;
+        }
+
+        .sim-flow-container {
+            flex: 1; padding: 40px 20px; display: flex; flex-direction: column-reverse; align-items: center;
+            overflow-y: auto; gap: 26px;
+        }
+
+        .sim-node {
+            width: 160px; padding: 16px 10px; background: var(--sim-node-bg);
+            border: 2px solid var(--sim-line); border-radius: 20px; text-align: center;
+            font-size: 0.85rem; font-weight: 800; color: var(--sim-text); position: relative;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 2;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.02);
+        }
+        .sim-node i { font-size: 1.8rem; margin-bottom: 8px; display: block; color: var(--text-secondary);}
+
+        .sim-node:not(:last-child)::after {
+            content: ''; position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%);
+            width: 3px; height: 28px; background: var(--sim-line); z-index: -1; transition: background 0.4s;
+        }
+
+        .node-active { border-color: var(--accent-main); color: var(--accent-main); box-shadow: 0 10px 25px rgba(255, 158, 170, 0.3); transform: scale(1.1); }
+        .node-active i { color: var(--accent-main); }
+        .node-active::after { background: var(--accent-main); box-shadow: 0 0 10px var(--accent-main);}
+
+        .node-green { border-color: var(--sim-safe); color: var(--sim-safe); box-shadow: 0 10px 25px rgba(114, 239, 221, 0.3); }
+        .node-green i { color: var(--sim-safe); }
+        .node-green::after { background: var(--sim-safe); }
+
+        .node-red { border-color: var(--sim-danger); color: var(--sim-danger); box-shadow: 0 10px 25px rgba(255, 93, 143, 0.3); animation: shakeNode 0.4s; }
+        .node-red i { color: var(--sim-danger); }
+        .node-red::after { background: var(--sim-danger); }
+
+        .node-warn { border-color: var(--sim-warn); color: var(--sim-warn); box-shadow: 0 10px 25px rgba(255, 209, 102, 0.3); }
+        .node-warn i { color: var(--sim-warn); }
+        .node-warn::after { background: var(--sim-warn); }
+
+        .sim-user-text { font-size: 0.7rem; color: var(--text-secondary); margin-top: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; font-weight: 600;}
+
+        /* =========================================================
+           PROFILE MODAL (SOFT BENTO)
+           ========================================================= */
+        #profilePage {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(253, 251, 251, 0.95);
+            backdrop-filter: blur(10px); z-index: 50; display: none; flex-direction: column; animation: fadeIn 0.3s ease;
+        }
+        .profile-container {
+            max-width: 500px; margin: 80px auto; padding: 40px; background: rgba(255,255,255,0.9);
+            border-radius: 30px; border: 2px solid #fff; box-shadow: 0 20px 50px rgba(255, 158, 170, 0.2); width: 90%;
+        }
+        .profile-avatar-wrapper { display: flex; flex-direction: column; align-items: center; margin-bottom: 35px; }
+        .profile-avatar-edit {
+            width: 140px; height: 140px; border-radius: 40px; background: linear-gradient(135deg, var(--accent-main), var(--accent-cyan));
+            color: white; display: flex; align-items: center; justify-content: center; font-size: 4.5rem; font-family: 'Quicksand';
+            font-weight: 800; cursor: pointer; overflow: hidden; border: 6px solid #fff; box-shadow: 0 15px 30px rgba(160, 196, 255, 0.4);
+            transition: transform 0.3s; position: relative;
+        }
+        .profile-avatar-edit img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-avatar-edit:hover { transform: scale(1.05) rotate(5deg); }
+
+        .form-group { margin-bottom: 30px; }
+        .form-group label { display: block; color: var(--accent-main); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; font-weight: 800; }
+        .form-group input { width: 100%; background: #f8f9fc; color: var(--text-primary); border: 2px solid #fff; border-radius: 16px; padding: 18px; font-size: 1.05rem; font-weight: 700; transition: border-color 0.3s, box-shadow 0.3s; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);}
+        .form-group input:focus { border-color: var(--accent-main); outline: none; box-shadow: 0 0 0 4px rgba(255, 158, 170, 0.2), inset 0 2px 5px rgba(0,0,0,0.02); }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        @keyframes shakeNode { 0%, 100% { transform: translateX(0); } 25%, 75% { transform: translateX(-5px); } 50% { transform: translateX(5px); } }
+        @keyframes slideInNotif { from { opacity: 0; transform: translateX(100px); } to { opacity: 1; transform: translateX(0); } }
+    </style>
+</head>
+<body>
+
+    <!-- Ambient UI FX -->
+    <div class="anime-bg"></div>
+
+    <div class="sidebar" id="appSidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-fan fa-spin" style="animation-duration: 10s;"></i> Secure Lamma
+        </div>
+        <button class="new-chat" onclick="newChat()">
+            <i class="fas fa-magic"></i> New Chat Session
+        </button>
+        <div class="chat-list" id="list">
+            <!-- Rendered list items -->
+        </div>
+    </div>
+
+    <div class="main">
+        
+        <div class="header">
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <button class="icon-btn" onclick="toggleSidebar()" title="Toggle Sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="status-pill">
+                    <i class="fas fa-star"></i> Core Safe
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <button id="simToggleBtn" class="icon-btn" onclick="toggleSimSidebar()" title="Toggle Trace Simulation">
+                    <i class="fas fa-project-diagram" id="simIcon" style="color: var(--text-secondary);"></i>
+                </button>
+                <button id="themeToggleBtn" class="icon-btn" onclick="toggleTheme()" title="Switch Theme">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
+                <button class="icon-btn" onclick="initSakura()" title="Spawn Sakura">
+                    <i class="fas fa-leaf" style="color: var(--accent-main);"></i>
+                </button>
+                <span id="navName" style="font-weight: 800; font-size: 1.05rem; font-family: 'Quicksand', sans-serif;"></span>
+                <button class="prof-circle" id="pIco" onclick="openProfile()">U</button>
+                <button onclick="logout()" style="border:none; background:none; color:var(--accent-sub); cursor:pointer; font-size: 1.2rem; padding-left: 8px;" title="Disconnect Core">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="chat-box" id="box">
+            <!-- Messages render here -->
+        </div>
+        
+        <div class="ldr" id="ldr">
+            <i class="fas fa-sync fa-spin"></i> Core Processing...
+        </div>
+
+        <div class="input-area">
+            <div class="wrapper">
+                <input type="file" id="fileInp" accept="image/*" style="display:none" onchange="previewImage(event)">
+                <button class="icon-btn" onclick="document.getElementById('fileInp').click()" title="Attach Payload">
+                    <i class="fas fa-image"></i>
+                </button>
+                
+                <button class="icon-btn" id="micBtn" onclick="toggleMic()" title="Voice Comms">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                
+                <img id="imgPreview" src="" alt="Preview">
+                
+                <textarea 
+                    id="uInp" 
+                    placeholder="Chat with Secure Llama..." 
+                    oninput="autoResizeTextarea(this)" 
+                    onkeydown="handleKey(event)"
+                ></textarea>
+                
+                <button class="send" id="sendBtn" onclick="send()" title="Transmit">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Profile Modal -->
+        <div id="profilePage">
+            <div class="header" style="background: transparent;">
+                <button class="icon-btn" onclick="closeProfile()">
+                    <i class="fas fa-arrow-left"></i> Return
+                </button>
+                <div style="font-family: 'Quicksand'; font-weight: 800; font-size: 1.3rem; color: var(--accent-main);">Identity Settings</div>
+                <div style="width: 80px;"></div>
+            </div>
+            
+            <div class="profile-container">
+                <div class="profile-avatar-wrapper">
+                    <input type="file" id="avatarUpload" accept="image/*" style="display: none;" onchange="handleAvatarUpload(event)">
+                    <div id="profileEditPic" class="profile-avatar-edit" onclick="document.getElementById('avatarUpload').click()">U</div>
+                </div>
+                <div class="form-group">
+                    <label>Senpai Name</label>
+                    <input type="text" id="editNameInp" placeholder="Enter Name">
+                </div>
+                <button class="new-chat" style="width: 100%; margin: 10px 0 0;" onclick="saveProfile()">
+                    <i class="fas fa-heart"></i> Save Settings
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Simulation Architecture Timeline -->
+    <div class="sim-sidebar" id="simSidebar">
+        <div class="sim-header">
+            <h3><i class="fas fa-project-diagram"></i> Live Network Trace</h3>
+            <button class="icon-btn" onclick="toggleSimSidebar()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="sim-flow-container">
+            <div class="sim-node" id="sim-user">
+                <i class="fas fa-user-circle"></i>USER
+                <div class="sim-user-text" id="sim-prompt-text">Awaiting input...</div>
+            </div>
+            <div class="sim-node" id="sim-firewall">
+                <i class="fas fa-shield-alt"></i>PROXY GATE
+            </div>
+            <div class="sim-node" id="sim-ai">
+                <i class="fas fa-brain"></i>AI CORE
+            </div>
+            <div class="sim-node" id="sim-dlp">
+                <i class="fas fa-filter"></i>DATA FILTER
+            </div>
+            <div class="sim-node" id="sim-out">
+                <i class="fas fa-check-circle"></i>CLEAN OUTPUT
+            </div>
+        </div>
+    </div>
+
+  <script>
+    // =========================================================================
+    // 🌸 ANIME JAVASCRIPT EFFECTS
+    // =========================================================================
+
+    function initSakura() {
+        const existing = document.getElementById('sakura-overlay');
+        if (existing) existing.remove();
+
+        const sdk = document.createElement('div');
+        sdk.id = 'sakura-overlay';
+        sdk.style.position = 'fixed'; sdk.style.inset = '0';
+        sdk.style.pointerEvents = 'none'; sdk.style.zIndex = '1';
+        sdk.style.overflow = 'hidden';
+        document.body.appendChild(sdk);
+        
+        for(let i=0; i<35; i++) {
+            let petal = document.createElement('div');
+            petal.className = 'sakura-petal';
+            petal.style.left = (Math.random() * 100) + 'vw';
+            petal.style.animationDuration = (Math.random() * 5 + 5) + 's';
+            petal.style.animationDelay = (Math.random() * 4) + 's';
+            sdk.appendChild(petal);
+        }
+
+    }
+
+    // Run once on boot
+    window.addEventListener('DOMContentLoaded', () => { setTimeout(initSakura, 500); });
+
+    // =========================================================================
+    // 🟢 SECURE LLAMA LOGIC & UI BEHAVIORS
+    // =========================================================================
+    
+    function handleKey(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault(); 
+            send();
+        }
+    }
+
+    function autoResizeTextarea(element) {
+        element.style.height = '50px'; 
+        element.style.height = Math.min(element.scrollHeight, 180) + 'px'; 
+    }
+
+    function copyToClipboard(btn, text) {
+        navigator.clipboard.writeText(text);
+        const originalIcon = btn.innerHTML;
+        btn.innerHTML = `<i class="fas fa-check" style="color:#72efdd;"></i> Kawaii copied!`;
+        setTimeout(() => { btn.innerHTML = originalIcon; }, 2000);
+    }
+
+    function escapeHTML(str) {
+        return str.replace(/[&<>'"]/g, tag => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+        }[tag]));
+    }
+
+    // =========================================================================
+    // 🎛️ SIDEBARS & THEME MANAGEMENT
+    // =========================================================================
+    
+    function initTheme() { 
+        if (localStorage.getItem('sentinel_theme') === 'dark') { 
+            document.body.classList.add('dark-mode'); 
+            document.getElementById('themeIcon').className = 'fas fa-sun'; 
+        } 
+    }
+    initTheme();
+    
+    function toggleTheme() { 
+        const isDark = document.body.classList.toggle('dark-mode'); 
+        localStorage.setItem('sentinel_theme', isDark ? 'dark' : 'light'); 
+        document.getElementById('themeIcon').className = isDark ? 'fas fa-sun' : 'fas fa-moon'; 
+    }
+
+    let isSimActive = false;
+    
+    function toggleSimSidebar() { 
+        isSimActive = document.getElementById('simSidebar').classList.toggle('open'); 
+        document.getElementById('simIcon').style.color = isSimActive ? 'var(--accent-main)' : 'var(--text-secondary)';
+    }
+
+    function toggleSidebar() { 
+        document.getElementById('appSidebar').classList.toggle('collapsed'); 
+    }
+
+    // =========================================================================
+    // 🔊 HUMAN-LIKE VOICE ENGINE
+    // =========================================================================
+    
+    let activeUtterance = null; 
+    let currentlySpeakingBtn = null;
+    
+    function playAudio(btn, text) {
+        if (window.speechSynthesis.speaking) { 
+            window.speechSynthesis.cancel(); 
+            if (currentlySpeakingBtn) { currentlySpeakingBtn.classList.remove('speaker-active'); }
+            if (currentlySpeakingBtn === btn) { currentlySpeakingBtn = null; return; } 
+        }
+        
+        let cleanText = text.replace(/```[\s\S]*?```/g, 'Code block skipped.').replace(/[*#_`~]/g, '').trim();
+        activeUtterance = new SpeechSynthesisUtterance(cleanText);
+        let voices = window.speechSynthesis.getVoices();
+        
+        let selectedVoice = voices.find(v => v.lang === 'hi-IN' && v.name.includes('Google')) || 
+                            voices.find(v => v.lang === 'hi-IN') || 
+                            voices.find(v => v.lang === 'en-IN') || voices[0];
+                            
+        if (selectedVoice) { activeUtterance.voice = selectedVoice; activeUtterance.lang = selectedVoice.lang; }
+        
+        activeUtterance.pitch = 1.15; // Slightly higher pitch for anime feel
+        activeUtterance.rate = 0.95; 
+        activeUtterance.volume = 1.0;
+        
+        btn.classList.add('speaker-active'); currentlySpeakingBtn = btn;
+        
+        activeUtterance.onend = () => { btn.classList.remove('speaker-active'); currentlySpeakingBtn = null; };
+        window.speechSynthesis.speak(activeUtterance);
+    }
+    
+    window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+
+    // =========================================================================
+    // 👤 USER PROFILE PROCESSING
+    // =========================================================================
+    
+    let savedAvatar = localStorage.getItem('sentinel_avatar') || null; 
+    let uName = localStorage.getItem('sentinel_name') || "Senpai"; 
+    let token = localStorage.getItem('sentinel_token');
+
+    async function fetchProfile() {
+        if (!token) return;
+        try {
+            const res = await fetch('/api/profile', { headers: { 'Authorization': 'Bearer ' + token } });
+            const data = await res.json();
+            
+            if (data.name) { uName = data.name; localStorage.setItem('sentinel_name', uName); }
+            if (data.pic && data.pic !== "null") { savedAvatar = data.pic; localStorage.setItem('sentinel_avatar', savedAvatar); }
+            
+            updateProfilePics(); 
+            const welcomeSpan = document.getElementById('welcomeNameSpan'); 
+            if (welcomeSpan) welcomeSpan.innerText = uName;
+        } catch (e) {
+            console.error("Profile Sync Error", e);
+        }
+    }
+
+    function openProfile() { 
+        document.getElementById('profilePage').style.display = 'flex'; 
+        document.getElementById('editNameInp').value = uName; 
+        updateProfilePics(); 
+    }
+    
+    function closeProfile() { document.getElementById('profilePage').style.display = 'none'; }
+    
+    function handleAvatarUpload(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas'); 
+                    const ctx = canvas.getContext('2d'); 
+                    canvas.width = 150; canvas.height = 150;
+                    const scale = Math.max(150 / img.width, 150 / img.height); 
+                    const x = (150 - img.width * scale) / 2; const y = (150 - img.height * scale) / 2;
+                    ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+                    savedAvatar = canvas.toDataURL('image/jpeg', 0.8); 
+                    updateProfilePics(); 
+                }; 
+                img.src = e.target.result;
+            }; 
+            reader.readAsDataURL(file);
+        }
+    }
+    
+    function updateProfilePics() { 
+        const char = uName.charAt(0).toUpperCase() || 'S'; 
+        const imgHTML = savedAvatar ? `<img src="${savedAvatar}">` : char; 
+        document.getElementById('profileEditPic').innerHTML = imgHTML; 
+        document.getElementById('pIco').innerHTML = imgHTML; 
+        document.getElementById('navName').innerText = uName; 
+    }
+    
+    function saveProfile() {
+        uName = document.getElementById('editNameInp').value.trim() || uName; 
+        localStorage.setItem('sentinel_name', uName); 
+        
+        if (savedAvatar) { localStorage.setItem('sentinel_avatar', savedAvatar); }
+        
+        if (token) { 
+            fetch('/api/profile', { 
+                method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, 
+                body: JSON.stringify({ preferred_name: uName, picture: savedAvatar }) 
+            }).catch(e => console.error(e)); 
+        }
+        
+        updateProfilePics(); 
+        const welcomeSpan = document.getElementById('welcomeNameSpan'); 
+        if (welcomeSpan) { welcomeSpan.innerText = uName; }
+        closeProfile();
+    }
+
+    // =========================================================================
+    // 🎤 COMMS (MIC) ENGINE
+    // =========================================================================
+    
+    let recognition = null; let isRecording = false; let autoSendTimer = null;
+    
+    function toggleMic() {
+        const btn = document.getElementById('micBtn'); const inp = document.getElementById('uInp');
+        
+        if (!isRecording) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; 
+            if (!SpeechRecognition) { alert("Voice recognition not supported."); return; }
+            
+            recognition = new SpeechRecognition(); recognition.lang = 'en-IN'; 
+            recognition.continuous = true; recognition.interimResults = true; 
+            
+            recognition.onstart = function() { 
+                isRecording = true; btn.classList.add('recording'); inp.placeholder = 'Listening to you...'; inp.value = ''; 
+            };
+            
+            recognition.onresult = function(event) {
+                let final_transcript = ''; let interim_transcript = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) { 
+                    if (event.results[i].isFinal) { final_transcript += event.results[i][0].transcript; } else { interim_transcript += event.results[i][0].transcript; }
+                }
+                
+                if (final_transcript || interim_transcript) {
+                    inp.value = final_transcript || interim_transcript; autoResizeTextarea(inp);
+                }
+                
+                if (autoSendTimer) { clearTimeout(autoSendTimer); }
+                autoSendTimer = setTimeout(() => { if (isRecording) recognition.stop(); }, 1500);
+            };
+            
+            recognition.onerror = function() { stopMicUI(btn, inp); }; 
+            recognition.onend = function() { stopMicUI(btn, inp); if (inp.value.trim() !== '') { send(); }};
+            
+            try { recognition.start(); } catch(e) { stopMicUI(btn, inp); }
+        } else { 
+            if (recognition) recognition.stop(); stopMicUI(btn, inp); 
+        }
+    }
+    
+    function stopMicUI(btn, inp) { 
+        isRecording = false; btn.classList.remove('recording'); inp.placeholder = 'Chat with Secure Llama...'; 
+        if (autoSendTimer) clearTimeout(autoSendTimer); 
+    }
+
+    // =========================================================================
+    // 🧠 CORE CHAT STATE
+    // =========================================================================
+    
+    let sessionId = null; let currentImageBase64 = null; let allSessions = []; 
+    let pinnedSessions = JSON.parse(localStorage.getItem('sentinel_pinned_chats')) || [];
+    
+    function previewImage(event) { 
+        const file = event.target.files[0]; 
+        if (file) { 
+            const reader = new FileReader(); 
+            reader.onload = e => { 
+                currentImageBase64 = e.target.result; document.getElementById('imgPreview').src = currentImageBase64; 
+                document.getElementById('imgPreview').style.display = 'block'; 
+            }; 
+            reader.readAsDataURL(file); 
+        } 
+    }
+
+    async function loadSessions() {
+        try {
+            const res = await fetch('/api/sessions', { headers: { 'Authorization': 'Bearer ' + token } }); 
+            const data = await res.json();
+            if(data.sessions) { allSessions = data.sessions; renderSidebar(); }
+        } catch(e) { console.error("Failed to load sessions", e); }
+    }
+
+    function renderSidebar() {
+        const listDiv = document.getElementById('list'); 
+        const pinned = allSessions.filter(s => pinnedSessions.includes(s.id)); 
+        const unpinned = allSessions.filter(s => !pinnedSessions.includes(s.id)); 
+        let html = '';
+        
+        if (pinned.length > 0) { 
+            html += `<div class="sidebar-section-title">✨ Pinned</div>`; 
+            pinned.forEach(s => html += createSessionHTML(s, true)); 
+            if(unpinned.length > 0) { html += `<div class="sidebar-section-title">Recent</div>`; }
+        }
+        
+        unpinned.forEach(s => html += createSessionHTML(s, false)); 
+        listDiv.innerHTML = html;
+    }
+
+    function createSessionHTML(s, isPinned) {
+        const isActive = sessionId === s.id ? 'active' : '';
+        return `
+        <div class="chat-item ${isActive}" onclick="openChat('${s.id}')">
+            <div class="chat-item-left">
+                <i class="far fa-star"></i><span class="chat-title">${s.title}</span>
+            </div>
+            <div class="chat-actions">
+                <button class="action-btn ${isPinned?'active':''}" onclick="togglePin('${s.id}', event)"><i class="fas fa-thumbtack"></i></button>
+                <button class="action-btn delete" onclick="deleteChat('${s.id}', event)"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>`;
+    }
+
+    function togglePin(id, e) { 
+        e.stopPropagation(); 
+        if(pinnedSessions.includes(id)) { pinnedSessions = pinnedSessions.filter(i => i !== id); } else { pinnedSessions = [...pinnedSessions, id]; }
+        localStorage.setItem('sentinel_pinned_chats', JSON.stringify(pinnedSessions)); renderSidebar(); 
+    }
+    
+    async function deleteChat(id, e) { 
+        e.stopPropagation(); 
+        if (!confirm("Confirm permanent deletion of this log?")) return; 
+        try { 
+            const res = await fetch('/api/delete_session', { 
+                method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, 
+                body: JSON.stringify({ session_id: id }) 
+            }); 
+            const data = await res.json(); 
+            if (data.success) { 
+                pinnedSessions = pinnedSessions.filter(i => i !== id); localStorage.setItem('sentinel_pinned_chats', JSON.stringify(pinnedSessions)); 
+                if (sessionId === id) { newChat(); }
+                showNotification('success', 'Log erased 🌸'); loadSessions(); 
+            } 
+        } catch(e) { showNotification('error', 'Operation failed'); } 
+    }
+
+    async function openChat(id) {
+        sessionId = id; localStorage.setItem('sentinel_current_session', id); 
+        document.getElementById('box').innerHTML = '<div class="ldr" style="display:block;"><i class="fas fa-magic"></i> Loading memories...</div>';
+        try {
+            const res = await fetch(`/api/history?session_id=${id}`, { headers: { 'Authorization': 'Bearer ' + token } });
+            const data = await res.json(); 
+            document.getElementById('box').innerHTML = '';
+            if (data.history) { data.history.forEach(m => addMsg(m.role, m.content)); }
+            renderSidebar();
+        } catch(e) { document.getElementById('box').innerHTML = 'Connection failed.'; }
+    }
+
+    // =========================================================================
+    // 🚨 LIVE SIMULATION TRACE ALGORITHM
+    // =========================================================================
+    
+    function resetSimulation() { 
+        const nodes = ['sim-user', 'sim-firewall', 'sim-ai', 'sim-dlp', 'sim-out'];
+        nodes.forEach(id => { document.getElementById(id).className = 'sim-node'; }); 
+        document.getElementById('sim-prompt-text').innerText = "Processing..."; 
+    }
+    
+    function runSlowSimulation(promptText, backendData) {
+        resetSimulation(); const delay = 1000; 
+        document.getElementById('sim-prompt-text').innerText = promptText.substring(0,25) + "...";
+        
+        const nUser = document.getElementById('sim-user'); const nFW = document.getElementById('sim-firewall'); 
+        const nAI = document.getElementById('sim-ai'); const nDLP = document.getElementById('sim-dlp'); const nOut = document.getElementById('sim-out');
+        
+        nUser.classList.add('node-green'); 
+        setTimeout(() => { nUser.classList.remove('node-green'); 
+            if (backendData.threat === 'CRITICAL (ATTACK)' || backendData.threat === 'CRITICAL') { 
+                nFW.classList.add('node-red'); showNotification('error', 'Proxy Gateway dropped malicious payload'); finalizeChatOutput(backendData); return; 
+            } else { nFW.classList.add('node-green'); }
+            
+            setTimeout(() => { nFW.classList.remove('node-green'); nAI.classList.add('node-active'); 
+                setTimeout(() => { nAI.classList.remove('node-active'); 
+                    const reply = backendData.reply || ""; 
+                    if (reply.includes('REDACTED_BY_DLP') || reply.includes('Egress Filter') || backendData.threat.includes('DLP')) { nDLP.classList.add('node-warn'); } else { nDLP.classList.add('node-green'); }
+                    setTimeout(() => { nDLP.classList.remove('node-green', 'node-warn'); nOut.classList.add('node-green'); finalizeChatOutput(backendData); 
+                        setTimeout(() => { nOut.classList.remove('node-green') }, 1000); 
+                    }, delay); 
+                }, delay); 
+            }, delay); 
+        }, delay);
+    }
+
+    function finalizeChatOutput(data) { 
+        document.getElementById('ldr').style.display = 'none'; 
+        if (data.reply) { 
+            sessionId = data.session_id; localStorage.setItem('sentinel_current_session', sessionId); 
+            if (data.threat && data.threat !== 'SAFE') { showNotification('warning', 'Trace Status: ' + data.threat); } 
+            addMsg('ai', data.reply); loadSessions(); 
+        } 
+    }
+
+    // =========================================================================
+    // 📨 INGRESS / EGRESS CONTROLLER
+    // =========================================================================
+    
+    async function send() {
+        const inp = document.getElementById('uInp'); const msg = inp.value.trim(); 
+        if (!msg && !currentImageBase64) return; 
+
+        if (document.querySelector('.welcome-screen')) { document.getElementById('box').innerHTML = ''; }
+        
+        let safeMsgHtml = escapeHTML(msg).replace(/\n/g, '<br>');
+        let displayMsg = currentImageBase64 ? `<img src="${currentImageBase64}" style="max-width:200px;border-radius:12px;box-shadow:0 5px 15px rgba(0,0,0,0.1);"><br>${safeMsgHtml}` : safeMsgHtml;
+        addMsg('user', displayMsg, true); 
+
+        const payload = { message: msg, session_id: sessionId, user_name: uName };
+        if (currentImageBase64) { payload.image = currentImageBase64; }
+
+        inp.value = ''; inp.style.height = '50px'; 
+        document.getElementById('imgPreview').style.display = 'none'; document.getElementById('ldr').style.display = 'block';
+
+        if (isSimActive) { 
+            resetSimulation(); document.getElementById('sim-user').classList.add('node-active'); document.getElementById('sim-prompt-text').innerText = msg.substring(0,25) + "..."; 
+        }
+
+        try {
+            const res = await fetch('/api/chat', { 
+                method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, 
+                body: JSON.stringify(payload) 
+            });
+            const data = await res.json();
+            
+            if (!res.ok) { 
+                document.getElementById('ldr').style.display = 'none'; showNotification('error', 'Error: ' + (data.error || 'Network Error')); 
+                addMsg('ai', '[ERROR] ' + (data.error || 'Network Error')); return; 
+            }
+            if (isSimActive) { runSlowSimulation(msg, data); } else { finalizeChatOutput(data); }
+        } catch(e) { 
+            document.getElementById('ldr').style.display = 'none'; showNotification('error', 'Network failure'); addMsg('ai', '[ERROR] Network connection lost.'); 
+        }
+        currentImageBase64 = null;
+    }
+    
+    // =========================================================================
+    // 🛠️ UI UTILITIES & BOOT SEQUENCE
+    // =========================================================================
+    
+    function showNotification(type, message) {
+        const notification = document.createElement('div'); 
+        notification.style.cssText = `
+            position: fixed; bottom: 30px; right: 30px; 
+            padding: 16px 24px; border-radius: 12px; color: white; 
+            font-weight: 700; font-family: 'Nunito', sans-serif; z-index: 9999; animation: slideInNotif 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
+            max-width: 320px; box-shadow: 0 10px 25px rgba(255,158,170,0.4); border: 2px solid rgba(255,255,255,0.8); backdrop-filter: blur(20px);
+        `;
+        const colors = { 'success': '#72efdd', 'error': '#ff5d8f', 'warning': '#ffd166', 'info': '#a0c4ff' };
+        notification.style.background = colors[type] || colors['info']; 
+        notification.textContent = message; 
+        document.body.appendChild(notification);
+        setTimeout(() => { notification.style.animation = 'slideUp 0.3s ease reverse forwards'; setTimeout(() => notification.remove(), 300); }, 4000);
+    }
+
+    function addMsg(role, content, preEscaped = false) {
+        const box = document.getElementById('box');
+        let html;
+        if (role === 'ai') { html = marked.parse(content); } else {
+            if (preEscaped || content.startsWith('<img') || content.includes('<br>')) { html = content; } else { html = escapeHTML(content).replace(/\n/g, '<br>'); }
+        }
+
+        let rawTextForEdit = content.replace(/<img[^>]*>/g,"").replace(/<br>/g, "\n");
+        const safeContent = encodeURIComponent(rawTextForEdit).replace(/'/g, "%27");
+        
+        let actions = '';
+        if (role === 'ai') {
+            actions = `
+            <div class="msg-action-bar">
+                <button class="msg-action-btn" onclick="playAudio(this, decodeURIComponent('${safeContent}'))"><i class="fas fa-volume-up"></i> Listen</button>
+                <button class="msg-action-btn" onclick="copyToClipboard(this, decodeURIComponent('${safeContent}'))"><i class="fas fa-copy"></i> Copy</button>
+            </div>`;
+        } else {
+            actions = `
+            <div class="msg-action-bar">
+                <button class="msg-action-btn" onclick="document.getElementById('uInp').value=decodeURIComponent('${safeContent}'); autoResizeTextarea(document.getElementById('uInp')); document.getElementById('uInp').focus();"><i class="fas fa-pen"></i> Edit</button>
+            </div>`;
+        }
+        
+        const msgDiv = document.createElement('div'); msgDiv.className = `msg ${role}`;
+        msgDiv.innerHTML = `<div class="bubble">${html}${actions}</div>`;
+        box.appendChild(msgDiv); box.scrollTop = box.scrollHeight;
+    }
+
+    function newChat() {
+        window.speechSynthesis.cancel(); sessionId = null; localStorage.removeItem('sentinel_current_session'); 
+        document.getElementById('box').innerHTML = `
+            <div class="welcome-screen">
+                <h1>Secure Llama ✨</h1>
+                <p>Welcome back, <span id="welcomeNameSpan" style="color: var(--accent-main); font-weight:800;">${uName}</span>. Ready for chat!</p>
+            </div>
+        `;
+        renderSidebar();
+    }
+
+    function logout() { localStorage.removeItem('sentinel_token'); window.location.href = '/login.html'; }
+
+    window.onload = () => { 
+        updateProfilePics(); 
+        if(token) { 
+            fetchProfile(); 
+            loadSessions().then(() => {
+                const savedSession = localStorage.getItem('sentinel_current_session');
+                if(savedSession) { openChat(savedSession); } else { newChat(); }
+            });
+        } else { newChat(); }
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentinel AI - Code Editor IDE</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5568d3;
+            --secondary: #764ba2;
+            --accent: #f093fb;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1a1f3a;
+            --bg-tertiary: #252d48;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-tertiary: #94a3b8;
+            --border: #334155;
+            --glass-bg: rgba(30, 41, 59, 0.8);
+            --glass-border: rgba(148, 163, 184, 0.12);
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            display: flex;
+            background: linear-gradient(135deg, #0f172a 0%, #1a1f3a 50%, #2d1b69 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Monaco', 'Courier New', monospace;
+            color: var(--text-primary);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 300px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 8px;
+        }
+
+        .file-item {
+            padding: 10px 12px;
+            margin: 4px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-secondary);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-item:hover {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: rgba(102, 126, 234, 0.4);
+            color: var(--text-primary);
+        }
+
+        .file-item.active {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.2) 100%);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .file-item i {
+            font-size: 14px;
+        }
+
+        .sidebar-actions {
+            padding: 12px;
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            gap: 8px;
+        }
+
+        .sidebar-btn {
+            flex: 1;
+            padding: 10px;
+            background: rgba(102, 126, 234, 0.15);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 6px;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-btn:hover {
+            background: rgba(102, 126, 234, 0.25);
+            border-color: var(--primary);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--glass-border);
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(10px);
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .header-title i {
+            color: var(--primary);
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 8px;
+        }
+
+        .toolbar-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: rgba(102, 126, 234, 0.15);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .toolbar-btn:hover {
+            background: rgba(102, 126, 234, 0.25);
+            color: var(--text-primary);
+            border-color: var(--primary);
+        }
+
+        .toolbar-btn.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .toolbar-btn i {
+            font-size: 14px;
+        }
+
+        /* Editor Container */
+        .editor-container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            gap: 12px;
+            padding: 12px;
+        }
+
+        .editor-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .editor-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--glass-border);
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .editor-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .line-numbers {
+            background: rgba(0, 0, 0, 0.4);
+            color: var(--text-tertiary);
+            padding: 12px 8px;
+            text-align: right;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            border-right: 1px solid var(--glass-border);
+            user-select: none;
+        }
+
+        .code-editor {
+            flex: 1;
+            padding: 12px 16px;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            resize: none;
+            outline: none;
+            overflow: auto;
+        }
+
+        /* Output Panel */
+        .output-panel {
+            height: 300px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .output-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--glass-border);
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .output-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 16px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 12px;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .output-status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .output-status.success {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .output-status.error {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--error);
+        }
+
+        .output-status.running {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        /* Modal & Inputs */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6);
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--glass-border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn.primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn.secondary {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+        }
+
+        .btn.secondary:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--glass-border);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-code"></i>
+            <span>Code Editor</span>
+        </div>
+
+        <div class="file-list" id="fileList"></div>
+
+        <div class="sidebar-actions">
+            <button class="sidebar-btn" onclick="createNewFile()" title="New File">
+                <i class="fas fa-plus"></i> New File
+            </button>
+            <button class="sidebar-btn" onclick="createNewFolder()" title="New Folder">
+                <i class="fas fa-folder-plus"></i> New Folder
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-title">
+                <i class="fas fa-file-code"></i>
+                <span id="currentFileName">Untitled</span>
+            </div>
+            <div class="toolbar">
+                <button class="toolbar-btn" id="languageSelect" onchange="changeLanguage()">
+                    <i class="fas fa-code"></i>
+                    <span>Language</span>
+                </button>
+                <button class="toolbar-btn" onclick="saveFile()" title="Save (Ctrl+S)">
+                    <i class="fas fa-save"></i>
+                    Save
+                </button>
+                <button class="toolbar-btn active" onclick="runCode()" title="Run Code (F5)">
+                    <i class="fas fa-play"></i>
+                    Run
+                </button>
+                <button class="toolbar-btn" onclick="showAIFix()">
+                    <i class="fas fa-magic"></i>
+                    AI Fix
+                </button>
+            </div>
+        </div>
+
+        <!-- Editor -->
+        <div class="editor-container">
+            <div style="flex: 1; display: flex; flex-direction: column;">
+                <div class="editor-panel">
+                    <div class="editor-header">
+                        <span id="fileInfo">Python • UTF-8</span>
+                    </div>
+                    <div class="editor-content">
+                        <div class="line-numbers" id="lineNumbers"></div>
+                        <textarea class="code-editor" id="codeEditor" placeholder="Write your code here..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div style="width: 1px; background: var(--glass-border);"></div>
+
+            <!-- Output Panel -->
+            <div style="width: 40%; display: flex; flex-direction: column;">
+                <div class="output-panel">
+                    <div class="output-header">
+                        <span>Output <span class="output-status" id="runStatus"></span></span>
+                        <button style="background: none; border: none; color: var(--text-tertiary); cursor: pointer; font-size: 14px;" onclick="clearOutput()">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="output-content" id="outputConsole">Ready to run...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- New File Modal -->
+    <div class="modal-overlay" id="newFileModal">
+        <div class="modal-content">
+            <div class="modal-title">
+                <i class="fas fa-file-plus"></i> Create New File
+            </div>
+            <div class="form-group">
+                <label class="form-label">File Name</label>
+                <input type="text" id="newFileName" class="form-input" placeholder="example.py" onkeydown="if(event.key==='Enter') createFileConfirm()">
+            </div>
+            <div class="modal-footer">
+                <button class="btn secondary" onclick="closeModal('newFileModal')">Cancel</button>
+                <button class="btn primary" onclick="createFileConfirm()">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Folder Modal -->
+    <div class="modal-overlay" id="newFolderModal">
+        <div class="modal-content">
+            <div class="modal-title">
+                <i class="fas fa-folder-plus"></i> Create New Folder
+            </div>
+            <div class="form-group">
+                <label class="form-label">Folder Name</label>
+                <input type="text" id="newFolderName" class="form-input" placeholder="my_folder" onkeydown="if(event.key==='Enter') createFolderConfirm()">
+            </div>
+            <div class="modal-footer">
+                <button class="btn secondary" onclick="closeModal('newFolderModal')">Cancel</button>
+                <button class="btn primary" onclick="createFolderConfirm()">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Fix Modal -->
+    <div class="modal-overlay" id="aiFix Modal">
+        <div class="modal-content">
+            <div class="modal-title">
+                <i class="fas fa-magic"></i> AI Code Improvement
+            </div>
+            <div id="aIFixContent" style="margin-bottom: 16px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 6px; max-height: 200px; overflow-y: auto; color: var(--text-secondary); font-size: 12px;"></div>
+            <div class="modal-footer">
+                <button class="btn secondary" onclick="closeModal('aIFixModal')">Close</button>
+                <button class="btn primary" onclick="applyAIFix()">Apply Suggestion</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const codeEditor = document.getElementById('codeEditor');
+        const outputConsole = document.getElementById('outputConsole');
+        const fileList = document.getElementById('fileList');
+        const lineNumbers = document.getElementById('lineNumbers');
+        const fileInfo = document.getElementById('fileInfo');
+        const currentFileName = document.getElementById('currentFileName');
+        const runStatus = document.getElementById('runStatus');
+
+        let currentFile = null;
+        let files = {};
+
+        // Initialize
+        async function initialize() {
+            try {
+                const token = localStorage.getItem('jwt_token');
+                if (!token) {
+                    window.location.href = '/';
+                    return;
+                }
+
+                const response = await fetch('/api/ide/list', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.files) {
+                        files = data.files;
+                        displayFileList();
+                        if (Object.keys(files).length > 0) {
+                            openFile(Object.keys(files)[0]);
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error('Initialize error:', e);
+            }
+        }
+
+        function displayFileList() {
+            fileList.innerHTML = '';
+            Object.keys(files).forEach(path => {
+                const item = document.createElement('div');
+                item.className = 'file-item' + (currentFile === path ? ' active' : '');
+                item.innerHTML = `<i class="fas ${files[path].is_file ? 'fa-file-code' : 'fa-folder'}"></i> <span>${path.split('/').pop()}</span>`;
+                item.onclick = () => openFile(path);
+                fileList.appendChild(item);
+            });
+        }
+
+        async function openFile(path) {
+            try {
+                const token = localStorage.getItem('jwt_token');
+                const response = await fetch(`/api/ide/read?path=${encodeURIComponent(path)}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        currentFile = path;
+                        codeEditor.value = data.content;
+                        currentFileName.textContent = path.split('/').pop();
+                        updateLineNumbers();
+                        displayFileList();
+                    }
+                }
+            } catch (e) {
+                console.error('File open error:', e);
+            }
+        }
+
+        function updateLineNumbers() {
+            const lines = codeEditor.value.split('\n').length;
+            let lineHTML = '';
+            for (let i = 1; i <= lines; i++) {
+                lineHTML += i + '\n';
+            }
+            lineNumbers.textContent = lineHTML;
+        }
+
+        codeEditor.addEventListener('input', updateLineNumbers);
+        codeEditor.addEventListener('scroll', () => {
+            lineNumbers.scrollTop = codeEditor.scrollTop;
+        });
+
+        async function saveFile() {
+            if (!currentFile) return;
+            try {
+                const token = localStorage.getItem('jwt_token');
+                const response = await fetch('/api/ide/save', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ path: currentFile, content: codeEditor.value })
+                });
+
+                if (response.ok) {
+                    outputConsole.textContent = '✅ File saved successfully!';
+                    runStatus.textContent = 'Saved';
+                    runStatus.className = 'output-status success';
+                }
+            } catch (e) {
+                outputConsole.textContent = '❌ Save failed: ' + e.message;
+            }
+        }
+
+        async function runCode() {
+            if (!currentFile) {
+                outputConsole.textContent = 'No file selected';
+                return;
+            }
+
+            runStatus.textContent = 'Running...';
+            runStatus.className = 'output-status running';
+            outputConsole.textContent = '⏳ Executing code...\n';
+
+            try {
+                const token = localStorage.getItem('jwt_token');
+                const ext = currentFile.split('.').pop();
+                const response = await fetch('/api/ide/run', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ path: currentFile, language: ext })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    outputConsole.textContent = data.stdout || data.stderr || 'No output';
+                    runStatus.textContent = data.success ? 'Success' : 'Error';
+                    runStatus.className = `output-status ${data.success ? 'success' : 'error'}`;
+                } else {
+                    outputConsole.textContent = '❌ Execution failed';
+                    runStatus.textContent = 'Error';
+                    runStatus.className = 'output-status error';
+                }
+            } catch (e) {
+                outputConsole.textContent = '❌ Error: ' + e.message;
+                runStatus.textContent = 'Error';
+                runStatus.className = 'output-status error';
+            }
+        }
+
+        function createNewFile() {
+            document.getElementById('newFileModal').classList.add('active');
+            document.getElementById('newFileName').value = '';
+            document.getElementById('newFileName').focus();
+        }
+
+        async function createFileConfirm() {
+            const name = document.getElementById('newFileName').value.trim();
+            if (!name) return;
+
+            try {
+                const token = localStorage.getItem('jwt_token');
+                await fetch('/api/ide/save', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ path: name, content: '' })
+                });
+
+                files[name] = { is_file: true };
+                displayFileList();
+                openFile(name);
+                closeModal('newFileModal');
+            } catch (e) {
+                console.error('Create file error:', e);
+            }
+        }
+
+        function createNewFolder() {
+            document.getElementById('newFolderModal').classList.add('active');
+            document.getElementById('newFolderName').value = '';
+            document.getElementById('newFolderName').focus();
+        }
+
+        async function createFolderConfirm() {
+            const name = document.getElementById('newFolderName').value.trim();
+            if (!name) return;
+
+            try {
+                const token = localStorage.getItem('jwt_token');
+                await fetch('/api/ide/mkdir', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ path: name })
+                });
+
+                files[name] = { is_file: false };
+                displayFileList();
+                closeModal('newFolderModal');
+            } catch (e) {
+                console.error('Create folder error:', e);
+            }
+        }
+
+        async function showAIFix() {
+            if (!codeEditor.value.trim()) {
+                outputConsole.textContent = 'No code to fix';
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('jwt_token');
+                const response = await fetch('/api/ide/ai_fix', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ code: codeEditor.value })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        document.getElementById('aIFixContent').textContent = data.suggestion;
+                        document.getElementById('aIFixModal').classList.add('active');
+                    }
+                }
+            } catch (e) {
+                outputConsole.textContent = 'AI Fix failed: ' + e.message;
+            }
+        }
+
+        function applyAIFix() {
+            const suggestion = document.getElementById('aIFixContent').textContent;
+            codeEditor.value = suggestion;
+            updateLineNumbers();
+            closeModal('aIFixModal');
+            saveFile();
+        }
+
+        function clearOutput() {
+            outputConsole.textContent = '';
+            runStatus.textContent = '';
+            runStatus.className = 'output-status';
+        }
+
+        function changeLanguage() {
+            // Language selector functionality
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        window.addEventListener('DOMContentLoaded', initialize);
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                saveFile();
+            }
+            if (e.key === 'F5') {
+                e.preventDefault();
+                runCode();
+            }
+        });
+    </script>
+</body>
+</html>

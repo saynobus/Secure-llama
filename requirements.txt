@@ -1,0 +1,52 @@
+flask>=3.0.0
+google-generativeai>=0.6.0
+flask-cors>=4.0.0
+python-dotenv>=1.0.0
+protobuf>=5.29.0,<6.0.0
+pillow>=10.0.0
+sqlalchemy>=2.0.0
+python-dateutil>=2.8.2
+google-auth-oauthlib>=1.0.0
+google-auth>=2.25.0
+PyJWT>=2.8.0
+cryptography>=40.0.0
+pyotp>=2.9.0
+flask-session>=0.5.0
+bcrypt>=4.0.0
+requests>=2.31.0
+qrcode>=7.4.2
+
+
+
+# Web Framework & Core
+Flask
+Flask-Cors
+
+# Google AI
+google-generativeai
+
+# Database
+SQLAlchemy
+
+# Security, IAM & MFA
+PyJWT
+bcrypt
+pyotp
+qrcode[pil]
+
+# Image Processing & Utilities
+Pillow
+requests
+
+# Admin Dashboard & Data Analysis
+pandas
+flask
+flask-cors
+flask-sqlalchemy
+flask-jwt-extended
+groq
+google-generativeai
+langchain
+langchain-community
+duckduckgo-search
+gunicorn

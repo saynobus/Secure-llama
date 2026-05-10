@@ -1,0 +1,17 @@
+.env
+api.txt
+company_secrets.csv
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+sentinel_env/
+*.log
+*.sqlite3
+*.db
+*.db-shm
+*.db-wal
+.vscode/

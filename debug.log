@@ -1,0 +1,11 @@
+2026-03-05 13:38:11,536 - __main__ - INFO - [OK] Created new session: 72d3d89a-761a-49fb-8c73-66510cc6c295
+2026-03-05 13:38:11,541 - __main__ - INFO - [OK] Saved user message
+2026-03-05 13:38:11,545 - __main__ - INFO - [API] Calling GROQ API with model: llama-3.3-70b-versatile
+2026-03-05 13:38:12,378 - __main__ - INFO - [API] Response Status: 200
+2026-03-05 13:38:12,379 - __main__ - INFO - [OK] Got response from API: 40 chars
+2026-03-05 13:38:12,391 - __main__ - INFO - [OK] Saved AI response and updated session
+2026-03-05 13:38:28,423 - __main__ - INFO - [OK] Saved user message
+2026-03-05 13:38:28,424 - __main__ - INFO - [API] Calling GROQ API with model: llama-3.1-70b-versatile
+2026-03-05 13:38:28,854 - __main__ - INFO - [API] Response Status: 400
+2026-03-05 13:38:28,855 - __main__ - ERROR - [ERROR] API Error: [ERROR] GROQ Error (400): The model `llama-3.1-70b-versatile` has been decommissioned and is no longer supported. Please refer to https://console.groq.com/docs/deprecations for a recommendation on which model to use instead.
+2026-03-05 13:38:28,859 - __main__ - INFO - [OK] Saved AI response and updated session

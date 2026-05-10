@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Llamma by Saýnobus</title>
+    <!-- Modern Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@600;800;900&display=swap" rel="stylesheet">
+    
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* ========================================================= */
+        /* 🎨 MAX UI THEME V3: MODERN, MINIMALIST AIRY                     */
+        /* ========================================================= */
+        :root {
+            --primary: #3b82f6; 
+            --accent: #8b5cf6;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --glass-bg: rgba(10, 10, 12, 0.5);
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: #000;
+            min-height: 100vh;
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* --- Fullscreen Flowing Aurora Background --- */
+        .aurora-bg {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
+            overflow: hidden; pointer-events: none;
+            background: #02040a;
+        }
+        
+        .blob {
+            position: absolute; border-radius: 50%; filter: blur(100px);
+            opacity: 0.6; mix-blend-mode: screen;
+            animation: flowBlob 20s ease-in-out infinite alternate;
+        }
+
+        .blob-1 { top: -20%; left: -10%; width: 70vw; height: 70vw; background: #1e3a8a; animation-delay: 0s; }
+        .blob-2 { bottom: -20%; right: -10%; width: 80vw; height: 80vw; background: #4c1d95; animation-delay: -5s; }
+        .blob-3 { top: 20%; left: 30%; width: 60vw; height: 60vw; background: #0369a1; animation-delay: -10s; }
+        .blob-4 { top: 60%; left: -20%; width: 50vw; height: 50vw; background: #6b21a8; animation-delay: -15s; }
+
+        @keyframes flowBlob {
+            0% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(15%, 15%) scale(1.1); }
+            66% { transform: translate(-10%, 10%) scale(0.9); }
+            100% { transform: translate(10%, -15%) scale(1.2); }
+        }
+
+        /* Noise Textures */
+        .noise {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E');
+            opacity: 0.05;
+        }
+
+        /* --- Top Navigation / Saýnobus Company --- */
+        .top-nav {
+            position: fixed; top: 0; left: 0; width: 100%; padding: 40px 60px;
+            display: flex; align-items: center; justify-content: space-between;
+            z-index: 10;
+        }
+        
+        .company-brand {
+            display: flex; align-items: center; gap: 12px;
+            font-size: 0.9rem; font-weight: 700; letter-spacing: 3px;
+            text-transform: uppercase; color: #fff;
+            animation: fadeInDown 1s ease-out;
+        }
+        .company-logo {
+            width: 38px; height: 38px; background: #fff; color: #000;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 8px; font-weight: 900;
+        }
+
+        /* --- Main Center Container --- */
+        .main-wrapper {
+            position: relative; z-index: 5;
+            min-height: 100vh; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; padding: 120px 20px 60px;
+        }
+
+        /* Massive Product Title */
+        .product-hero {
+            text-align: center; margin-bottom: 50px;
+            animation: fadeInUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        
+        .product-hero h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(4rem, 8vw, 7.5rem);
+            font-weight: 900; line-height: 1.1; letter-spacing: -3px;
+            
+            /* Flowing animated text gradient */
+            background: linear-gradient(to right, #ffffff 20%, #93c5fd 40%, #c4b5fd 60%, #ffffff 80%);
+            background-size: 200% auto;
+            color: transparent; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: textFlow 6s linear infinite;
+        }
+        
+        @keyframes textFlow { to { background-position: 200% center; } }
+        
+        .product-hero p {
+            font-size: 1.1rem; color: var(--text-muted); margin-top: 15px; font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- Login Card Minimalist --- */
+        .login-card {
+            width: 100%; max-width: 460px;
+            background: var(--glass-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 28px; padding: 45px;
+            backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+            box-shadow: 0 40px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05);
+            animation: fadeInUp 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .login-header { text-align: center; margin-bottom: 35px; }
+        .login-header h2 { font-size: 1.5rem; font-weight: 600; margin-bottom: 8px; }
+
+        .auth-buttons {
+            display: flex; justify-content: center; margin-bottom: 30px;
+            background: rgba(255,255,255,0.03); border-radius: 100px; padding: 6px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        /* Custom styling for Google button wrapper */
+        #google-wrap { display: flex; justify-content: center; width: 100%; }
+
+        .divider {
+            display: flex; align-items: center; margin: 30px 0; color: #475569; font-size: 0.8rem;
+        }
+        .divider::before, .divider::after { content: ''; flex: 1; border-top: 1px solid rgba(255,255,255,0.1); }
+        .divider::before { margin-right: 15px; } .divider::after { margin-left: 15px; }
+
+        .form-group { margin-bottom: 24px; }
+        .form-group label { display: block; font-size: 0.8rem; font-weight: 500; color: var(--text-muted); margin-bottom: 10px; }
+        
+        .input-wrap { position: relative; }
+        .input-wrap input {
+            width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
+            padding: 16px 20px; border-radius: 16px; color: #fff; font-size: 1rem;
+            transition: var(--transition);
+        }
+        .input-wrap input:focus {
+            outline: none; border-color: rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.05); box-shadow: 0 0 0 4px rgba(255,255,255,0.02);
+        }
+        .input-wrap input::placeholder { color: #475569; }
+
+        .btn-primary {
+            width: 100%; padding: 18px; background: #fff; color: #000;
+            border: none; border-radius: 16px; font-size: 1.05rem; font-weight: 600;
+            cursor: pointer; transition: var(--transition);
+            display: flex; justify-content: center; align-items: center; gap: 10px;
+            margin-top: 10px;
+        }
+        .btn-primary:hover { background: #e2e8f0; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(255,255,255,0.1); }
+        .btn-primary:active { transform: translateY(0); }
+
+        .skip-btn {
+            display: block; width: 100%; text-align: center; margin-top: 30px;
+            background: none; border: none; color: var(--text-muted); font-size: 0.95rem;
+            cursor: pointer; transition: var(--transition);
+        }
+        .skip-btn:hover { color: #fff; text-decoration: underline; text-underline-offset: 4px; }
+
+        /* Animations */
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Alerts */
+        .toast {
+            position: fixed; top: 40px; right: 40px; z-index: 100;
+            padding: 16px 24px; border-radius: 12px; background: #111; border: 1px solid rgba(255,255,255,0.1);
+            color: #fff; display: flex; align-items: center; gap: 12px; font-size: 0.95rem; font-weight: 500;
+            transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.error { background: #fee2e2; border-color: #f87171; color: #991b1b; }
+        .toast.success { background: #d1fae5; border-color: #34d399; color: #065f46; }
+
+        @media (max-width: 768px) {
+            .product-hero h1 { font-size: clamp(3rem, 12vw, 4rem); }
+            .login-card { padding: 30px 25px; }
+            .top-nav { padding: 30px 25px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Fluid Aurora BG -->
+    <div class="aurora-bg">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+        <div class="blob blob-4"></div>
+    </div>
+    <div class="noise"></div>
+
+    <!-- Company Branding Top -->
+    <nav class="top-nav">
+        <div class="company-brand">
+            <div class="company-logo"><i data-lucide="brain"></i></div>
+            SAÝNOBUS
+        </div>
+    </nav>
+
+    <!-- Global Toast Notif -->
+    <div id="toast" class="toast">
+        <i id="toastIcon" data-lucide="alert-circle" width="20" height="20"></i>
+        <span id="toastMsg">Message</span>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-wrapper">
+        
+        <div class="product-hero">
+            <h1>Secure Llama</h1>
+            <p>Enterprise intelligence. Decentralized alignment.</p>
+        </div>
+
+        <div class="login-card">
+            <div class="login-header">
+                <h2>Welcome Back</h2>
+            </div>
+
+            <!-- Google Auth -->
+            <div class="auth-buttons">
+                <div id="google-wrap">
+                    <div id="g_id_onload"
+                         data-client_id="983842564449-7mh0pl455g3a22jb4f1nmfu0knii2mf0.apps.googleusercontent.com"
+                         data-context="signin"
+                         data-ux_mode="popup"
+                         data-callback="handleGoogleLogin"
+                         data-auto_prompt="false">
+                    </div>
+                    <div class="g_id_signin" 
+                         data-type="standard" 
+                         data-shape="pill" 
+                         data-theme="outline" 
+                         data-text="continue_with" 
+                         data-size="large" 
+                         data-width="360">
+                    </div>
+                </div>
+            </div>
+
+            <div class="divider">or continue directly</div>
+
+            <form id="loginForm" onsubmit="handleNativeLogin(event)">
+                <div class="form-group">
+                    <label>Email address</label>
+                    <div class="input-wrap">
+                        <input type="email" id="login-email" placeholder="agent@saynobus.com" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Secure Core Key</label>
+                    <div class="input-wrap">
+                        <input type="password" id="login-password" placeholder="••••••••" required>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-primary" id="loginBtn">
+                    <span>Access Core</span>
+                </button>
+            </form>
+
+            <button onclick="skipLogin()" class="skip-btn">
+                Bypass Security Protocol &rarr;
+            </button>
+        </div>
+    </main>
+
+    <script>
+        lucide.createIcons();
+
+        function setCookie(name, value, days) {
+            const d = new Date();
+            d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+            document.cookie = `${name}=${value};expires=${d.toUTCString()};path=/;SameSite=Lax`;
+        }
+
+        function showToast(msg, type = 'error') {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toastIcon');
+            const text = document.getElementById('toastMsg');
+            
+            toast.className = 'toast show';
+            if (type === 'error') {
+                toast.classList.add('error');
+                icon.setAttribute('data-lucide', 'alert-triangle');
+            } else {
+                toast.classList.add('success');
+                icon.setAttribute('data-lucide', 'check-circle');
+            }
+            
+            text.innerText = msg;
+            lucide.createIcons({root: toast});
+            
+            setTimeout(() => { toast.classList.remove('show'); }, 4000);
+        }
+
+        function setLoadingState(btn, isLoading, text = 'Processing...') {
+            if (isLoading) {
+                btn.disabled = true;
+                btn.innerHTML = `<i data-lucide="loader" class="lucide-spin" width="20" height="20"></i> <span>${text}</span>`;
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = `<span>${text}</span>`;
+            }
+            lucide.createIcons({root: btn});
+            const spinIcon = btn.querySelector('.lucide-spin');
+            if(spinIcon) spinIcon.style.animation = "spin 1s linear infinite";
+        }
+
+        const style = document.createElement('style');
+        style.innerHTML = `@keyframes spin { 100% { transform: rotate(360deg); } }`;
+        document.head.appendChild(style);
+
+        // --- NATIVE LOGIN ---
+        async function handleNativeLogin(e) {
+            e.preventDefault();
+            const btn = document.getElementById('loginBtn');
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            setLoadingState(btn, true, "Authenticating...");
+
+            try {
+                const res = await fetch(`${window.location.origin}/api/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                let data = {};
+                try { data = await res.json(); } catch(e) {}
+                
+                if (res.ok && data.success) {
+                    localStorage.setItem('sentinel_token', data.token);
+                    setCookie('sentinel_token', data.token, 7);
+                    showToast("Access Granted.", "success");
+                    btn.innerHTML = `<i data-lucide="check" width="20" height="20"></i> <span>Authenticated</span>`;
+                    lucide.createIcons({root: btn});
+                    setTimeout(() => { window.location.href = '/dashboard'; }, 1000);
+                } else {
+                    showToast(data.error || "ACCESS DENIED: KEY INVALID", "error");
+                    setLoadingState(btn, false, "Access Core");
+                }
+            } catch (err) {
+                showToast("CORE CONNECTION FAILED", "error");
+                setLoadingState(btn, false, "Access Core");
+            }
+        }
+
+        // --- GOOGLE LOGIN ---
+        async function handleGoogleLogin(response) {
+            const btn = document.getElementById('loginBtn');
+            setLoadingState(btn, true, "Authenticating Google...");
+            try {
+                const res = await fetch(`${window.location.origin}/api/google-login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: response.credential })
+                });
+                
+                let data = {};
+                if(res.headers.get('content-type')?.includes('application/json')) { data = await res.json(); }
+                
+                if (res.ok && data.success) {
+                    localStorage.setItem('sentinel_token', data.token);
+                    setCookie('sentinel_token', data.token, 7);
+                    showToast("Access Granted.", "success");
+                    btn.innerHTML = `<i data-lucide="check" width="20" height="20"></i> <span>Authenticated</span>`;
+                    lucide.createIcons({root: btn});
+                    setTimeout(() => { window.location.href = '/dashboard'; }, 1000);
+                } else {
+                    showToast("Google Auth Failed.", "error");
+                    setLoadingState(btn, false, "Access Core");
+                }
+            } catch (err) { 
+                showToast("CORE CONNECTION FAILED", "error");
+                setLoadingState(btn, false, "Access Core");
+            }
+        }
+
+        // --- BYPASS ---
+        function skipLogin() {
+            const guestToken = "guest_bypass_" + Math.random().toString(36).substring(7);
+            localStorage.setItem('sentinel_token', guestToken);
+            setCookie('sentinel_token', guestToken, 1);
+            showToast("Bypassing...", "success");
+            setTimeout(() => { window.location.href = '/dashboard'; }, 800);
+        }
+    </script>
+</body>
+</html>

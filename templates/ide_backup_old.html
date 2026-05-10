@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentinel Code IDE - VS Code Style Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Fira Code', 'Monaco', monospace;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .ide-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: #252526;
+            border-right: 1px solid #3e3e42;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 15px;
+            background: #007acc;
+            color: white;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .file-item {
+            padding: 12px 15px;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .file-item:hover {
+            background: #2d2d30;
+            border-left-color: #007acc;
+        }
+
+        .file-item.active {
+            background: #1e1e1e;
+            border-left-color: #007acc;
+            color: #fff;
+        }
+
+        .editor-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .editor-tabs {
+            display: flex;
+            background: #1e1e1e;
+            border-bottom: 1px solid #3e3e42;
+            overflow-x: auto;
+        }
+
+        .editor-tab {
+            padding: 12px 20px;
+            background: #252526;
+            color: #858585;
+            cursor: pointer;
+            border-right: 1px solid #3e3e42;
+            border-bottom: 2px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .editor-tab.active {
+            background: #1e1e1e;
+            color: #fff;
+            border-bottom: 2px solid #007acc;
+        }
+
+        .editor-tab:hover {
+            background: #2d2d30;
+        }
+
+        .editor-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .editor-wrapper {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100%;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border: none;
+            padding: 15px;
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            resize: none;
+            outline: none;
+            z-index: 100;
+            position: relative;
+        }
+
+        .line-numbers {
+            background: #1e1e1e;
+            color: #858585;
+            padding: 15px 10px;
+            text-align: right;
+            user-select: none;
+            border-right: 1px solid #3e3e42;
+            line-height: 1.5;
+            font-size: 14px;
+            width: 50px;
+            overflow: hidden;
+        }
+
+        .line-number {
+            display: block;
+            height: 21px;
+        }
+
+        .problems-panel {
+            width: 400px;
+            background: #252526;
+            border-left: 1px solid #3e3e42;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .problems-header {
+            padding: 15px;
+            background: #007acc;
+            color: white;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .problems-content {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .problem-item {
+            padding: 15px;
+            border-bottom: 1px solid #3e3e42;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .problem-item:hover {
+            background: #2d2d30;
+        }
+
+        .problem-item.error {
+            border-left: 3px solid #f48771;
+        }
+
+        .problem-item.warning {
+            border-left: 3px solid #dcdcaa;
+        }
+
+        .problem-message {
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        .problem-location {
+            font-size: 12px;
+            color: #858585;
+        }
+
+        .bottom-panel {
+            height: 200px;
+            background: #1e1e1e;
+            border-top: 1px solid #3e3e42;
+            display: flex;
+            flex-direction: column;
+            display: none;
+        }
+
+        .bottom-panel.show {
+            display: flex;
+        }
+
+        .bottom-tabs {
+            display: flex;
+            background: #252526;
+            border-bottom: 1px solid #3e3e42;
+        }
+
+        .bottom-tab {
+            padding: 10px 15px;
+            background: transparent;
+            color: #858585;
+            border: none;
+            cursor: pointer;
+        }
+
+        .bottom-tab.active {
+            color: #fff;
+            border-bottom: 2px solid #007acc;
+        }
+
+        .bottom-content {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            font-size: 13px;
+        }
+
+        .ai-suggestion {
+            background: rgba(0, 122, 204, 0.1);
+            border-left: 3px solid #007acc;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+
+        .ai-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #4ec9b0;
+        }
+
+        .ai-text {
+            font-size: 12px;
+            line-height: 1.5;
+            color: #d4d4d4;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            padding: 10px 15px;
+            background: #252526;
+            border-bottom: 1px solid #3e3e42;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 6px 12px;
+            background: #007acc;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 3px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: #005a9e;
+        }
+
+        .btn.secondary {
+            background: #3e3e42;
+            color: #d4d4d4;
+        }
+
+        .btn.secondary:hover {
+            background: #4e4e54;
+        }
+
+        .status-bar {
+            height: 25px;
+            background: #007acc;
+            color: white;
+            padding: 0 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+        }
+
+        .empty-state {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #858585;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="ide-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-folder"></i>
+                Explorer
+            </div>
+            <div class="sidebar-content" id="fileListContainer">
+                <div class="file-item" onclick="createNewFile()">
+                    <i class="fas fa-plus"></i> New File
+                </div>
+                <div class="file-item" onclick="createNewFolder()">
+                    <i class="fas fa-folder-plus"></i> New Folder
+                </div>
+                <!-- dynamic file list injected here -->
+            </div>
+        </div>
+
+        <!-- Editor Area -->
+        <div class="editor-area">
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <button class="btn" onclick="saveFile()"><i class="fas fa-save"></i> Save</button>
+                <button class="btn secondary" onclick="runFile()"><i class="fas fa-play"></i> Run</button>
+                <button class="btn secondary" onclick="analyzeCode()"><i class="fas fa-magic"></i> Analyze with Sentinel AI</button>
+                <button class="btn secondary" onclick="aiFix()"><i class="fas fa-wrench"></i> AI Fix / Improve</button>
+                <button class="btn secondary" onclick="toggleProblems()"><i class="fas fa-exclamation-circle"></i> Show Problems</button>
+                <button class="btn secondary" onclick="logout()" style="margin-left: auto;"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+
+            <!-- Tabs -->
+            <div class="editor-tabs">
+                <div class="editor-tab active" id="tab-main">
+                    <i class="fas fa-file-code"></i>
+                    <span>main.js</span>
+                    <i class="fas fa-times" onclick="closeTab()" style="cursor: pointer; margin-left: 8px;"></i>
+                </div>
+            </div>
+
+            <!-- Editor -->
+            <div class="editor-content">
+                <div class="line-numbers" id="lineNumbers"></div>
+                <div class="editor-wrapper">
+                    <textarea id="codeEditor" placeholder="Write your code here... Sentinel AI will analyze it for errors and suggestions.">
+// Sentinel Code IDE - Connected to Sentinel AI
+// Start coding and Sentinel AI will analyze for errors
+
+function helloWorld() {
+    console.log("Hello, Sentinel AI!");
+}
+</textarea>
+                </div>
+            </div>
+
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div>
+                    <span id="cursorPosition">Ln 1, Col 1</span>
+                    <span style="margin-left: 20px;"><i class="fas fa-circle" style="color: #4ec9b0;"></i> Sentinel Connected</span>
+                </div>
+                <div>
+                    <span id="wordCount">0 words</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Problems Panel -->
+        <div class="problems-panel">
+            <div class="problems-header">
+                <i class="fas fa-list"></i>
+                Sentinel AI Insights
+            </div>
+            <div class="problems-content" id="problemsContent">
+                <div class="empty-state">
+                    <i class="fas fa-lightbulb"></i>
+                    <p>Analyze your code with Sentinel AI</p>
+                    <p style="font-size: 12px; color: #858585;">Click "Analyze with Sentinel AI" to get insights</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Panel (hidden) -->
+    <div class="bottom-panel" id="bottomPanel">
+        <div class="bottom-tabs">
+            <button class="bottom-tab active">Terminal</button>
+            <button class="bottom-tab">Output</button>
+            <button class="bottom-tab">Debug Console</button>
+        </div>
+        <div class="bottom-content">
+            <div id="terminalOutput"></div>
+        </div>
+    </div>
+
+    <script>
+        const codeEditor = document.getElementById('codeEditor');
+        const lineNumbers = document.getElementById('lineNumbers');
+        const token = localStorage.getItem('jwt_token');
+
+        if (!token) {
+            window.location.href = '/';
+        }
+
+        // Update line numbers
+        function updateLineNumbers() {
+            const lines = codeEditor.value.split('\n').length;
+            lineNumbers.innerHTML = '';
+            for (let i = 1; i <= lines; i++) {
+                const div = document.createElement('div');
+                div.className = 'line-number';
+                div.textContent = i;
+                lineNumbers.appendChild(div);
+            }
+        }
+
+        codeEditor.addEventListener('input', updateLineNumbers);
+        codeEditor.addEventListener('scroll', function() {
+            lineNumbers.scrollTop = this.scrollTop;
+        });
+
+        // Track cursor position
+        codeEditor.addEventListener('click', updateCursorPosition);
+        codeEditor.addEventListener('keyup', updateCursorPosition);
+
+        function updateCursorPosition() {
+            const pos = codeEditor.selectionStart;
+            const text = codeEditor.value;
+            let line = 1, col = 1;
+            
+            for (let i = 0; i < pos; i++) {
+                if (text[i] === '\n') {
+                    line++;
+                    col = 1;
+                } else {
+                    col++;
+                }
+            }
+            
+            document.getElementById('cursorPosition').textContent = `Ln ${line}, Col ${col}`;
+        }
+
+        async function analyzeCode() {
+            const code = codeEditor.value;
+            if (!code.trim()) {
+                alert('Please write some code first');
+                return;
+            }
+
+            document.getElementById('problemsContent').innerHTML = `
+                <div style="padding: 15px; text-align: center; color: #858585;">
+                    <i class="fas fa-spinner" style="animation: spin 1s linear infinite;"></i>
+                    <p>Analyzing code with Sentinel AI...</p>
+                </div>
+            `;
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: `Analyze this code for errors, bugs, and improvements. Provide specific line numbers and suggestions:\n\n${code}`,
+                        session_id: 'ide_analysis'
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    displayAnalysis(data.reply);
+                }
+            } catch (error) {
+                document.getElementById('problemsContent').innerHTML = `
+                    <div class="problem-item error">
+                        <div class="problem-message">Failed to analyze code</div>
+                        <div class="problem-location">${error.message}</div>
+                    </div>
+                `;
+            }
+        }
+
+        async function aiFix() {
+            const code = codeEditor.value;
+            if (!code.trim()) {
+                alert('Please write some code first');
+                return;
+            }
+            const path = currentFilePath || 'untitled';
+            const panel = document.getElementById('problemsContent');
+            panel.innerHTML = `<div style="padding:15px;text-align:center;color:#858585;"><i class="fas fa-spinner" style="animation:spin 1s linear infinite;"></i><p>Requesting Sentinel AI to fix/improve code...</p></div>`;
+            try {
+                const resp = await fetch('/api/ide/ai_fix', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ path, code })
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    const suggestion = data.suggestion || 'No suggestion returned';
+                    panel.innerHTML = ` <div class="ai-suggestion"><div class="ai-title">🤖 Sentinel AI Suggested Fix</div><div class="ai-text" id="aiFixContent">${suggestion.replace(/\n/g, '<br>')}</div><div style="margin-top:12px; text-align:right;"><button class="btn secondary" onclick="dismissAIFix()">Dismiss</button> <button class="btn" onclick="applyAIFix()">Apply Fix to Editor</button></div></div>`;
+                    // store last suggestion
+                    window._lastAIFix = suggestion;
+                } else {
+                    panel.innerHTML = `<div class="problem-item error"><div class="problem-message">AI fix failed</div><div class="problem-location">${data.error}</div></div>`;
+                }
+            } catch (e) {
+                panel.innerHTML = `<div class="problem-item error"><div class="problem-message">AI fix failed</div><div class="problem-location">${e.message}</div></div>`;
+            }
+        }
+
+        function dismissAIFix() {
+            document.getElementById('problemsContent').innerHTML = '';
+        }
+
+        function applyAIFix() {
+            const suggestion = window._lastAIFix;
+            if (!suggestion) return alert('No suggestion available');
+            // strip triple backticks if present
+            const m = suggestion.match(/```(?:[\w+\-]*)\n([\s\S]*)```/);
+            const code = m ? m[1] : suggestion;
+            codeEditor.value = code.replace(/\r\n/g, '\n');
+            updateLineNumbers();
+            alert('AI fix applied to editor. Review and Save.');
+        }
+
+        function displayAnalysis(analysis) {
+            const content = document.getElementById('problemsContent');
+            content.innerHTML = `
+                <div class="ai-suggestion">
+                    <div class="ai-title">🤖 Sentinel AI Analysis</div>
+                    <div class="ai-text">${analysis.replace(/\n/g, '<br>')}</div>
+                </div>
+            `;
+        }
+
+        let currentFilePath = null;
+
+async function loadFileList() {
+    try {
+        const resp = await fetch('/api/ide/list', {
+            credentials: 'same-origin',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await resp.json();
+        if (data.success) {
+            const container = document.getElementById('fileListContainer');
+            // remove everything after the new folder button
+            container.querySelectorAll('.file-item.dynamic').forEach(el => el.remove());
+            data.files.forEach(f => {
+                const item = document.createElement('div');
+                item.className = 'file-item dynamic';
+                item.textContent = f;
+                item.onclick = () => openFile(f);
+                container.appendChild(item);
+            });
+        }
+    } catch (e) {
+        console.error('Failed to load file list', e);
+    }
+}
+
+function createNewFile() {
+    const path = prompt('Enter new file path (relative) e.g. src/app.js');
+    if (!path) return;
+    currentFilePath = path;
+    codeEditor.value = '';
+    updateLineNumbers();
+    updateCursorPosition();
+}
+
+function createNewFolder() {
+    const path = prompt('Enter new folder path (relative) e.g. src/utils');
+    if (!path) return;
+    fetch('/api/ide/mkdir', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ path })
+    }).then(r => r.json()).then(data => {
+        if (data.success) {
+            loadFileList();
+        } else {
+            alert('Failed to create folder: ' + data.error);
+        }
+    });
+}
+
+async function openFile(filename) {
+    try {
+        const resp = await fetch(`/api/ide/read?path=${encodeURIComponent(filename)}`, {
+            credentials: 'same-origin',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await resp.json();
+        if (data.success) {
+            codeEditor.value = data.content;
+            updateLineNumbers();
+            currentFilePath = filename;
+            document.getElementById('cursorPosition').textContent = `Editing: ${filename}`;
+        } else {
+            alert('Could not open file: ' + data.error);
+        }
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+function closeTab() {
+    createNewFile();
+}
+
+function toggleProblems() {
+    const panel = document.querySelector('.problems-panel');
+    panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
+}
+
+async function saveFile() {
+    if (!currentFilePath) {
+        alert('No file selected; use "New File" or open an existing one.');
+        return;
+    }
+    const content = codeEditor.value;
+    const resp = await fetch('/api/ide/save', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ path: currentFilePath, content })
+    });
+    const data = await resp.json();
+    if (data.success) {
+        loadFileList();
+        alert('Saved ' + currentFilePath);
+    } else {
+        alert('Save failed: ' + data.error);
+    }
+}
+
+async function runFile() {
+    if (!currentFilePath) {
+        alert('Open or create a file first');
+        return;
+    }
+    const resp = await fetch('/api/ide/run', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ path: currentFilePath })
+    });
+    const data = await resp.json();
+    const outputDiv = document.getElementById('terminalOutput');
+    outputDiv.innerHTML = '';
+    if (data.success) {
+        outputDiv.innerHTML = `<pre>${data.stdout || ''}${data.stderr ? '\nERROR:\n' + data.stderr : ''}</pre>`;
+        document.getElementById('bottomPanel').classList.add('show');
+    } else {
+        outputDiv.innerHTML = `<pre>Run failed: ${data.error}</pre>`;
+        document.getElementById('bottomPanel').classList.add('show');
+    }
+}
+
+        function logout() {
+            fetch('/auth/logout', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            }).then(() => {
+                localStorage.removeItem('jwt_token');
+                window.location.href = '/';
+            });
+        }
+
+        // Initialize
+        loadFileList();
+        updateLineNumbers();
+        updateCursorPosition();
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </script>
+</body>
+</html>

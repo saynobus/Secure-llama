@@ -1,0 +1,14 @@
+language: python
+
+python:
+    - "3.9"
+    - "3.10"
+    - "3.11"
+
+script:
+    - python setup.py test
+
+branches:
+    only:
+        - master
+        - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
