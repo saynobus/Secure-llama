@@ -5,7 +5,7 @@ import os, uuid, requests, urllib.parse, jwt, logging, json, re, csv, time, trac
 from datetime import datetime, timedelta
 from functools import wraps
 from dotenv import load_dotenv
-
+from werkzeug.middleware.proxy_fix import ProxyFix
 load_dotenv()
 
 # Google Auth Imports 
@@ -52,7 +52,7 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 PORT = int(os.environ.get("PORT", 5000))
-
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 http_session = requests.Session()
 MONITOR_URL = "http://127.0.0.1:5002/bridge"
 
