@@ -181,7 +181,7 @@ def sync_csv_to_vault():
             with open(csv_path, 'w', newline='', encoding='utf-8') as f:
                 writer = csv.writer(f)
                 writer.writerow(["Employee_ID", "Name", "Email", "Salary", "Role", "Secret_Key"])
-                writer.writerow(["EMP101", "Sample User", "sample@sentinel.ai", "250000", "CEO", os.environ.get("COMPANY_SECRET_KEY", "REDACTED")])
+                writer.writerow(["EMP101", "Shreyansh Soni", "shreyansh@sentinel.ai", "250000", "CEO", "SENTINEL-ADMIN-77"])
             
         db.query(SensitiveVault).delete() 
         with open(csv_path, mode='r', encoding='utf-8-sig') as file:
