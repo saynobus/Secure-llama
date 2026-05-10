@@ -50,3 +50,4 @@ langchain
 langchain-community
 duckduckgo-search
 gunicorn
+flask-socketio
