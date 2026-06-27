@@ -239,25 +239,11 @@
                 <h2>Welcome Back</h2>
             </div>
 
-            <!-- Google Auth -->
-            <div class="auth-buttons">
-                <div id="google-wrap">
-                    <div id="g_id_onload"
-                         data-client_id="983842564449-7mh0pl455g3a22jb4f1nmfu0knii2mf0.apps.googleusercontent.com"
-                         data-context="signin"
-                         data-ux_mode="popup"
-                         data-callback="handleGoogleLogin"
-                         data-auto_prompt="false">
-                    </div>
-                    <div class="g_id_signin" 
-                         data-type="standard" 
-                         data-shape="pill" 
-                         data-theme="outline" 
-                         data-text="continue_with" 
-                         data-size="large" 
-                         data-width="360">
-                    </div>
-                </div>
+            <!-- Google Auth Disabled / Coming Soon -->
+            <div class="auth-buttons" style="border: none; background: transparent; padding: 0;">
+                <button type="button" style="width: 100%; padding: 16px; background-color: rgba(255,255,255,0.02); color: #64748b; border: 1px dashed rgba(255,255,255,0.1); border-radius: 16px; cursor: not-allowed; font-weight: 500; font-size: 1rem; display: flex; justify-content: center; align-items: center; gap: 10px; transition: all 0.3s;" onclick="alert('Google Login is currently under maintenance. Please use standard Email/Password to login. Coming Soon!')">
+                    <i data-lucide="shield-alert" width="20" height="20"></i> Google Login (Coming Soon)
+                </button>
             </div>
 
             <div class="divider">or continue directly</div>
@@ -365,37 +351,6 @@
                     setLoadingState(btn, false, "Access Core");
                 }
             } catch (err) {
-                showToast("CORE CONNECTION FAILED", "error");
-                setLoadingState(btn, false, "Access Core");
-            }
-        }
-
-        // --- GOOGLE LOGIN ---
-        async function handleGoogleLogin(response) {
-            const btn = document.getElementById('loginBtn');
-            setLoadingState(btn, true, "Authenticating Google...");
-            try {
-                const res = await fetch(`${window.location.origin}/api/google-login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ token: response.credential })
-                });
-                
-                let data = {};
-                if(res.headers.get('content-type')?.includes('application/json')) { data = await res.json(); }
-                
-                if (res.ok && data.success) {
-                    localStorage.setItem('sentinel_token', data.token);
-                    setCookie('sentinel_token', data.token, 7);
-                    showToast("Access Granted.", "success");
-                    btn.innerHTML = `<i data-lucide="check" width="20" height="20"></i> <span>Authenticated</span>`;
-                    lucide.createIcons({root: btn});
-                    setTimeout(() => { window.location.href = '/dashboard'; }, 1000);
-                } else {
-                    showToast("Google Auth Failed.", "error");
-                    setLoadingState(btn, false, "Access Core");
-                }
-            } catch (err) { 
                 showToast("CORE CONNECTION FAILED", "error");
                 setLoadingState(btn, false, "Access Core");
             }
